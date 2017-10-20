@@ -1,0 +1,12 @@
+#game_window {
+    float: center;
+}
+
+#login_div {
+    margin: auto;
+    width: 250px;
+}
+
+#signup_button {
+    margin-left: 20px;
+}
