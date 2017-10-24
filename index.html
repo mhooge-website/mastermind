@@ -7,14 +7,31 @@
     <script src="/scripts/mastermind.js"></script>
     <script src="/scripts/generate_nav.js"></script>
 </head>
-<body onload="generate_nav('Mastermind'); showLogin();">
+<body onload="generate_nav('Mastermind');">
     <link rel="stylesheet" type="text/css" href="/projects/mastermind/mastermind-style.css"/>
 	<link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css"/>
 	<script src="/bootstrap/js/jquery.min.js"></script>
     <script src="/bootstrap/js/bootstrap.min.js"></script>
 
     <div id="game_window" class="container">
-        
+        <div id="login_div">
+            <form action="/projects/mastermind/connect.php" method="post">
+                <div class="form-group">
+                    <label for="input_user">Username</label>
+                    <input class="form-control" id="input_user" name="input_user" placeholder="Enter Username"></input>
+                </div>
+                <div class="form-group">
+                    <label for="input_user">Username</label>
+                    <input class="form-control" id="input_pass" name="input_pass" type="password" placeholder="Enter Password"></input>
+                </div>
+                <div id="check_remember" class="form-check">
+                    <label class="form-check-label"></label>
+                    <input type="checkbox" class="form-check-input">Remember Me</input>
+                </div>
+                <button id="login_button" type="submit" class="btn btn-primary">Login</button>
+                <button id="signup_button" type="submit" class="btn btn-primary">Sign Up</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>
