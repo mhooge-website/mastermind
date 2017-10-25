@@ -15,7 +15,7 @@
 
     <div id="game_window" class="container">
         <div id="login_div">
-            <form action="/projects/mastermind/connect.php" method="post">
+            <form method="post">
                 <div class="form-group">
                     <label for="input_user">Username</label>
                     <input class="form-control" id="input_user" name="input_user" placeholder="Enter Username"></input>
@@ -28,8 +28,8 @@
                     <label class="form-check-label"></label>
                     <input type="checkbox" class="form-check-input">Remember Me</input>
                 </div>
-                <button id="login_button" type="submit" class="btn btn-primary">Login</button>
-                <button id="signup_button" type="submit" class="btn btn-primary">Sign Up</button>
+                <button formaction="/projects/mastermind/login" id="login_button" type="submit" class="btn btn-primary">Login</button>
+                <button formaction="/projects/mastermind/signup" id="signup_button" type="submit" class="btn btn-primary">Sign Up</button>
             </form>
         </div>
     </div>
