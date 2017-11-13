@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Mastermind</title>
     <link rel="stylesheet" type="text/css" href="/global-style.css">
-    <script src="/scripts/mastermind.js"></script>
+    <script src="/projects/mastermind/mastermind.js"></script>
     <script src="/scripts/generate_nav.js"></script>
 </head>
 <body onload="generate_nav('Mastermind');">
@@ -13,24 +13,64 @@
 	<script src="/bootstrap/js/jquery.min.js"></script>
     <script src="/bootstrap/js/bootstrap.min.js"></script>
 
-    <div id="game_window" class="container">
-        <div id="login_div">
-            <form method="post">
-                <div class="form-group">
-                    <label for="input_user">Username</label>
-                    <input class="form-control" id="input_user" name="input_user" placeholder="Enter Username"></input>
-                </div>
-                <div class="form-group">
-                    <label for="input_user">Username</label>
-                    <input class="form-control" id="input_pass" name="input_pass" type="password" placeholder="Enter Password"></input>
-                </div>
-                <div id="check_remember" class="form-check">
-                    <label class="form-check-label"></label>
-                    <input type="checkbox" class="form-check-input" name="check_rmbr">Remember Me</input>
-                </div>
-                <button formaction="/projects/mastermind/login" id="login_button" type="submit" class="btn btn-primary">Login</button>
-                <button formaction="/projects/mastermind/signup" id="signup_button" type="submit" class="btn btn-primary">Sign Up</button>
-            </form>
+    <div id="content-div" class="container">
+        <div id="startup-div">
+            <label id="startup-header-label" for="new-game-button">Start New Game</label>
+            <button id="new-game-button" class="btn btn-primary" onclick="swapWindow('startup-div', 'create-game-div')">New Game</button>
+            <label for="search-game-button">Or...</label>
+            <button id="search-game-button" class="btn btn-primary">Search For Game</button>
+        </div>
+
+        <div id="create-game-div">
+            <header><h2>Create Game</h2></header>
+            <button class="btn btn-primary" onclick="swapWindow('create-game-div', 'pvp-setup-div')">Player vs. Player</button>
+            <button class="btn btn-primary" onclick="swapWindow('create-game-div', 'pvai-setup-div')">Player vs. AI</button>
+        </div>
+
+        <div id="pvai-setup-div">
+            <header><h2>Player vs. AI</h2></header>
+        </div>
+
+        <div id="pvp-setup-div">
+            <header><h2>Player vs. Player</h2></header>
+            <div>
+                <input id="game-name" readonly value="My Game" type="text" maxlength="42"></input>
+                <button id="edit-game-name" class="btn btn-primary" onclick="editGameName();">Edit</button>
+                <p id="game-id">Game ID: Something Hashed</p>
+                <input id="check-mastermind" name="check-mastermind" type="checkbox"></input>
+                <label for="check-mastermind">You are the Mastermind</label>
+                <p id="status-text">Status: Waiting for opponent.</p>
+            </div>
+
+            <script>createPVPGame();</script>
+        </div>
+
+        <div id="game-div-mastermind">
+            <div id="m-guesses-div" class="guesses-div">
+                
+            </div>
+            <div id="m-results-div" class="results-div">
+
+            </div>
+            <div id="m-code-div" class="code-div">
+                
+            </div>
+        </div>
+
+        <div id="game-div-guesser">
+            <div id="g-code-div" class="code-div">
+                
+            </div>
+            <div id="g-guesses-div" class="guesses-div">
+                
+            </div>
+            <div id="g-results-div" class="results-div">
+
+            </div>
+        </div>
+
+        <div id="search-div">
+
         </div>
     </div>
 </body>

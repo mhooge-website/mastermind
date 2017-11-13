@@ -1,16 +1,53 @@
-#game_window {
+#content-div {
     float: center;
 }
 
-#login_div {
+#startup-div {
     margin: auto;
-    width: 250px;
+    text-align: center;
+    width: 200px;
 }
 
-#check_remember {
-    margin-bottom: 10px;
+#startup-div > label {
+    font-size: 20px;
+    width: 100%;
 }
 
-#signup_button {
-    margin-left: 20px;
+#game-div-guesser {
+    display: none;
+}
+
+#game-div-mastermind {
+    display: none;
+}
+
+#create-game-div {
+    margin: auto;
+    text-align: center;
+    display: none;
+}
+
+#game-name {
+    border: none;
+    width: fit-content;
+}
+
+#pvai-setup-div {
+    margin: auto;
+    text-align: center;
+    display: none;
+}
+
+#pvp-setup-div {
+    margin: auto;
+    text-align: center;
+    display: none;
+}
+
+#game-id {
+    margin-top: 30px;
+}
+
+#new-game-button {
+    margin-bottom: 20px;
 }
