@@ -18,7 +18,7 @@
             <label id="startup-header-label" for="new-game-button">Start New Game</label>
             <button id="new-game-button" class="btn btn-primary" onclick="swapWindow('startup-div', 'create-game-div')">New Game</button>
             <label for="search-game-button">Or...</label>
-            <button id="search-game-button" class="btn btn-primary">Search For Game</button>
+            <button id="search-game-button" class="btn btn-primary" onclick="swapWindow('startup-div', 'search-game-div')">Search For Game</button>
         </div>
 
         <div id="create-game-div">
@@ -26,6 +26,14 @@
             <button class="btn btn-primary" 
             onclick="swapWindow('create-game-div', 'pvp-setup-div'); createPVPGame();">Player vs. Player</button>
             <button class="btn btn-primary" onclick="swapWindow('create-game-div', 'pvai-setup-div')">Player vs. AI</button>
+        </div>
+
+        <div id="search-game-div" onload="populateList(null);">
+            <header><h2>Search</h2></header>
+            <input id="search-name-input" placeholder="Game ID or Name" type="text" maxlength="42"></input>
+            <div>
+                <li id="game-list"></li>
+            </div>
         </div>
 
         <div id="pvai-setup-div">
@@ -38,9 +46,14 @@
                 <input id="game-name" readonly value="My Game" type="text" maxlength="42"></input>
                 <button id="edit-game-name" class="btn btn-primary" onclick="editGameName();">Edit</button>
                 <p id="game-id">Game ID: Something Hashed</p>
-                <input id="check-mastermind" name="check-mastermind" type="checkbox"></input>
-                <label for="check-mastermind">You are the Mastermind</label>
-                <p id="status-text">Status: Waiting for opponent.</p>
+                
+                <label>You are the Mastermind <input id="check-mastermind" name="check-mastermind" type="checkbox" 
+                    onclick="setMastermind('check-mastermind');"></input></label>
+                <label for="check-repeat">Allow repeated pins <input id="check-repeat" name="check-repeat" type="checkbox" 
+                    onclick="setRepeatPins('check-repeat');"></input></label>
+                <label for="check-empty">Allow empty pins <input id="check-empty" name="check-empty" type="checkbox" 
+                    onclick="setEmptyPins('check-empty');"></input></label>
+                <p id="status-text">Waiting for opponent.</p>
             </div>
         </div>
 

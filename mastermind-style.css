@@ -21,6 +21,16 @@
     display: none;
 }
 
+#search-game-div {
+    display: none;
+    margin: auto;
+    text-align: center;
+}
+
+#search-game-div > div {
+    text-align: left;
+}
+
 #create-game-div {
     margin: auto;
     text-align: center;
@@ -29,7 +39,12 @@
 
 #game-name {
     border: none;
-    width: fit-content;
+    width: 150px;
+    font-size: 18px;
+}
+
+#edit-game-name {
+    float: right;
 }
 
 #pvai-setup-div {
@@ -39,13 +54,22 @@
 }
 
 #pvp-setup-div {
+    width: 230px;
     margin: auto;
     text-align: center;
     display: none;
 }
 
 #game-id {
-    margin-top: 30px;
+    margin-top: 20px;
+    font-size: 16px;
+    text-align: center;
+}
+
+#status-text {
+    margin-top: 20px;
+    font-style: italic;
+    font-size: 16px;
 }
 
 #new-game-button {

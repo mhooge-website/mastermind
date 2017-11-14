@@ -1,7 +1,14 @@
+const MASTERMIND_TURN = true;
+
 var isMastermind = false;
 var isOnline = false;
-var id = null;
-var name = null;
+var gameId;
+var name;
+var turn;
+var status;
+var round;
+var repeatPins = false;
+var emptyPins = false;
 
 function hideWindow(id) {
     document.getElementById(id).style.display = "none";
@@ -16,38 +23,105 @@ function swapWindow(oldId, newId) {
     showWindow(newId);
 }
 
+function setMastermind(id) {
+    isMastermind = document.getElementById(id).checked;
+    saveGameToDB();
+}
+
+function setRepeatPins(id) {
+    repeatPins = document.getElementById(id).checked;
+    saveGameToDB();
+}
+
+function setEmptyPins(id) {
+    emptyPins = document.getElementById(id).checked;
+    saveGameToDB();
+}
+
+function setShownID() {
+    document.getElementById("game-id").innerText = "Game ID: " + gameId;
+}
+
 function editGameName() {
-    document.getElementById("game-name").readOnly = false;
+    let txtField = document.getElementById("game-name");
+    txtField.readOnly = false;
     let button = document.getElementById("edit-game-name");
     button.textContent = "OK";
     button.addEventListener("click", function(e) {
         button.textContent = "Edit";
         button.removeEventListener(this);
+        name = txtField.value;
+        saveGameToDB();
     });
 }
 
-function createPVPGame() {
-    startWaitAnimation();
+function setInitialPVPValues() {
+    setInitialSharedValues();
+    status = "lobby";
+    isOnline = true;
+    gameId = null
+    name = document.getElementById("game-name").value;
 }
 
-function startWaitAnimation() {
+function setInitialSharedValues() {
+    turn = MASTERMIND_TURN;
+    round = 0;
+}
+
+function createPVPGame() {
+    startWaiting();
+    setInitialPVPValues();
+    saveGameToDB();
+}
+
+function startWaiting() {
     let statusLabel = document.getElementById("status-text");
     var dots = 0;
+    let originalText = statusLabel.innerText;
     setInterval(() => {
         statusLabel.innerText = statusLabel.innerText + ".";
         dots++;
         if(dots == 3) {
-            statusLabel.innerText = "Status: Waiting for opponent.";
+            statusLabel.innerText = "Waiting for opponent.";
             dots = 0;
         }
     }, 1000);
 }
 
-function showLogin() {
+function saveGameToDB() {
+    let gameInfo = { "id":gameId, "name":name, "turn":turn, "status":status, "round": round, "repeat":repeatPins, "empty":emptyPins };
+    let jsonMsg = JSON.stringify(gameInfo);
+
+    var http = new XMLHttpRequest();
+	http.onreadystatechange = function() {
+        if(this.readyState == 4) {
+            if(this.status == 200) {
+                let oldId = gameId;
+                gameId = this.responseText;
+
+                if(oldId == null) {
+                    setShownID();
+                }
+            }
+            else if(this.status == 500) {
+                console.log(this.responseText);
+            }
+        }
+    }
+    http.open("GET", "/projects/mastermind/save_game.php?game=" + jsonMsg, true);
+    http.send();
+}
+
+function populateList(search) {
+    
+    let listDiv = document.createElement("div");
+
+}
+
+function loadGameFromDB(id) {
     
 }
 
-function showGameWindow(mastermind) {
-    isMastermind = mastermind;
+function showLogin() {
+    
 }
-
