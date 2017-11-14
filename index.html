@@ -23,7 +23,8 @@
 
         <div id="create-game-div">
             <header><h2>Create Game</h2></header>
-            <button class="btn btn-primary" onclick="swapWindow('create-game-div', 'pvp-setup-div')">Player vs. Player</button>
+            <button class="btn btn-primary" 
+            onclick="swapWindow('create-game-div', 'pvp-setup-div'); createPVPGame();">Player vs. Player</button>
             <button class="btn btn-primary" onclick="swapWindow('create-game-div', 'pvai-setup-div')">Player vs. AI</button>
         </div>
 
@@ -41,8 +42,6 @@
                 <label for="check-mastermind">You are the Mastermind</label>
                 <p id="status-text">Status: Waiting for opponent.</p>
             </div>
-
-            <script>createPVPGame();</script>
         </div>
 
         <div id="game-div-mastermind">

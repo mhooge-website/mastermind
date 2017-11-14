@@ -27,7 +27,20 @@ function editGameName() {
 }
 
 function createPVPGame() {
+    startWaitAnimation();
+}
 
+function startWaitAnimation() {
+    let statusLabel = document.getElementById("status-text");
+    var dots = 0;
+    setInterval(() => {
+        statusLabel.innerText = statusLabel.innerText + ".";
+        dots++;
+        if(dots == 3) {
+            statusLabel.innerText = "Status: Waiting for opponent.";
+            dots = 0;
+        }
+    }, 1000);
 }
 
 function showLogin() {
