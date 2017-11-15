@@ -23,16 +23,22 @@
 
 #search-game-div {
     display: none;
-    margin: auto;
     text-align: center;
 }
 
 #search-game-div > div {
-    text-align: left;
+    margin-top: 30px;
+}
+
+#game-list {
+    list-style: none;
 }
 
 #search-result-div {
+    text-align: center;
+    display: inline-block;
     column-count: 6;
+    column-rule-style: solid;
     column-rule-color: black;
     column-rule-width: 2px;
 }

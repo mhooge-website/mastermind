@@ -18,7 +18,8 @@
             <label id="startup-header-label" for="new-game-button">Start New Game</label>
             <button id="new-game-button" class="btn btn-primary" onclick="swapWindow('startup-div', 'create-game-div')">New Game</button>
             <label for="search-game-button">Or...</label>
-            <button id="search-game-button" class="btn btn-primary" onclick="swapWindow('startup-div', 'search-game-div')">Search For Game</button>
+            <button id="search-game-button" class="btn btn-primary" 
+            onclick="swapWindow('startup-div', 'search-game-div'); populateList('all');">Search For Game</button>
         </div>
 
         <div id="create-game-div">
@@ -28,7 +29,7 @@
             <button class="btn btn-primary" onclick="swapWindow('create-game-div', 'pvai-setup-div')">Player vs. AI</button>
         </div>
 
-        <div id="search-game-div" onload="populateList(null);">
+        <div id="search-game-div">
             <header><h2>Search</h2></header>
             <input id="search-name-input" placeholder="Game ID or Name" type="text" maxlength="42"></input>
             <button class="btn btn-primary" onclick="populateList('search-name-input');">Search</button>

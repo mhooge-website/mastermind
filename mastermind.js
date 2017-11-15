@@ -113,16 +113,29 @@ function saveGameToDB() {
 }
 
 function populateList(search) {
-    let results = loadGameFromDB(search);
-    if(results == null) {
-        console.log("Error!");
-        return;
+    if(search != "all") {
+        search = document.getElementById(search).value;
     }
-    else if(results == "empty") {
-        console.log("Empty!");
-        return;
-    }
+    var http = new XMLHttpRequest();
+    http.onreadystatechange = function() {
+        let valid = checkValidity(this);
+        if(valid == "wait") return;
+        else if(valid == "error") {
+            console.log("Error!");
+            return;
+        }
+        else if(this.responseText == "empty") {
+            console.log("empty");
+            return "empty";
+        }
 
+        createLists(JSON.parse(this.responseText));
+    };
+    http.open("GET", "/projects/mastermind/load_game.php?search=" + search, true);
+    http.send();
+}
+
+function createLists(results) {
     for(i = 0; i < results.length; i++) {
         let listDiv = document.createElement("div");
         listDiv.id = "search-result-div";
@@ -136,11 +149,11 @@ function populateList(search) {
         listDiv.appendChild(pName);  
         
         let pStatus = document.createElement("p");
-        pStatus.textContent = "Status: " + results[i][2];
+        pStatus.textContent = "Status: " + results[i][3];
         listDiv.appendChild(pStatus);
 
         let pRound = document.createElement("p");
-        pRound.textContent = "Round: " + results[i][3];
+        pRound.textContent = "Round: " + results[i][2];
         listDiv.appendChild(pRound);
 
         let pRepeat = document.createElement("p");
@@ -155,23 +168,20 @@ function populateList(search) {
     }
 }
 
-function loadGameFromDB(search) {
+function loadGameFromDB(search, func) {
     var http = new XMLHttpRequest();
     http.onreadystatechange = function() {
-        if(this.readyState == 4) {
-            if(this.status == 200) {
-                if(this.responseText != "empty") {
-                    return JSON.parse(this.responseText);
-                }
-                return "empty";
-            }
-            else {
-                return null;
-            }
-        }
+        let valid = checkValidity();
+        JSON.parse(this.responseText);
     };
-    http.open("GET", "/projects/mastermind/load_game.php?search=" + search);
+    http.open("GET", "/projects/mastermind/load_game.php?search=" + search, true);
     http.send();
+}
+
+function checkValidity(http) {
+    if(http.readyState != 4) return "wait";
+    if(http.status != 200) return "error";
+    return null;
 }
 
 function showLogin() {

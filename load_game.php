@@ -6,7 +6,7 @@ $search = $_GET["search"];
 
 $conn = connect_db("mhso_grpro");
 
-if($search == null) {
+if($search == "all") {
     echo getAllGames();
     die;
 }
@@ -16,7 +16,7 @@ if($results != "empty") {
     echo $results;
 }
 else {
-    echo getResults($search, "WHERE NAME LIKE '?'");
+    echo getResults($search, "WHERE name LIKE ?");
 }
 
 function getAllGames() {
@@ -24,11 +24,6 @@ function getAllGames() {
     
     $res = $conn->query("SELECT id, name, turn, status, round, repeat_pins, empty_pins FROM mastermind_games");
     
-    if(!($res = $stmt->get_result())) {
-        http_response_code(500);
-        echo "Could not get results: (" . $stmt->errno . ") " . $stmt->error;
-        die;
-    }
     if($res->num_rows == 0) {
         return "empty";
     }
@@ -40,7 +35,7 @@ function getAllGames() {
 
 function getResults($search, $where) {
     global $stmt, $conn;
-    if (!($stmt = $conn->prepare("SELECT id, name, turn, status, round, repeat_pins, empty_pins FROM mastermind_games ".$where))) {
+    if (!($stmt = $conn->prepare("SELECT id, name, turn, status, round, repeat_pins, empty_pins FROM mastermind_games " . $where))) {
         http_response_code(500);
         echo "Prepare failed: (" . $conn->errno . ") " . $conn->error;
         die;
