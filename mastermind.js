@@ -49,7 +49,7 @@ function editGameName() {
     button.textContent = "OK";
     button.addEventListener("click", function(e) {
         button.textContent = "Edit";
-        button.removeEventListener(this);
+        button.removeEventListener("click", this);
         name = txtField.value;
         saveGameToDB();
     });
@@ -107,19 +107,71 @@ function saveGameToDB() {
                 console.log(this.responseText);
             }
         }
-    }
+    };
     http.open("GET", "/projects/mastermind/save_game.php?game=" + jsonMsg, true);
     http.send();
 }
 
 function populateList(search) {
-    
-    let listDiv = document.createElement("div");
+    let results = loadGameFromDB(search);
+    if(results == null) {
+        console.log("Error!");
+        return;
+    }
+    else if(results == "empty") {
+        console.log("Empty!");
+        return;
+    }
 
+    for(i = 0; i < results.length; i++) {
+        let listDiv = document.createElement("div");
+        listDiv.id = "search-result-div";
+
+        let pId = document.createElement("p");
+        pId.textContent = "ID: " + results[i][0];
+        listDiv.appendChild(pId);
+
+        let pName = document.createElement("p");
+        pName.textContent = "Name: " + results[i][1];
+        listDiv.appendChild(pName);  
+        
+        let pStatus = document.createElement("p");
+        pStatus.textContent = "Status: " + results[i][2];
+        listDiv.appendChild(pStatus);
+
+        let pRound = document.createElement("p");
+        pRound.textContent = "Round: " + results[i][3];
+        listDiv.appendChild(pRound);
+
+        let pRepeat = document.createElement("p");
+        pRepeat.textContent = "Repeat Pins: " + results[i][4];
+        listDiv.appendChild(pRepeat);
+
+        let pEmpty = document.createElement("p");
+        pEmpty.textContent = "Empty Pins: " + results[i][5];
+        listDiv.appendChild(pEmpty);
+
+        document.getElementById("game-list").appendChild(listDiv);
+    }
 }
 
-function loadGameFromDB(id) {
-    
+function loadGameFromDB(search) {
+    var http = new XMLHttpRequest();
+    http.onreadystatechange = function() {
+        if(this.readyState == 4) {
+            if(this.status == 200) {
+                if(this.responseText != "empty") {
+                    return JSON.parse(this.responseText);
+                }
+                return "empty";
+            }
+            else {
+                return null;
+            }
+        }
+    };
+    http.open("GET", "/projects/mastermind/load_game.php?search=" + search);
+    http.send();
 }
 
 function showLogin() {

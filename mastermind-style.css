@@ -31,6 +31,12 @@
     text-align: left;
 }
 
+#search-result-div {
+    column-count: 6;
+    column-rule-color: black;
+    column-rule-width: 2px;
+}
+
 #create-game-div {
     margin: auto;
     text-align: center;

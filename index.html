@@ -31,6 +31,7 @@
         <div id="search-game-div" onload="populateList(null);">
             <header><h2>Search</h2></header>
             <input id="search-name-input" placeholder="Game ID or Name" type="text" maxlength="42"></input>
+            <button class="btn btn-primary" onclick="populateList('search-name-input');">Search</button>
             <div>
                 <li id="game-list"></li>
             </div>
