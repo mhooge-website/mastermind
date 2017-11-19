@@ -16,13 +16,13 @@ if($results != "empty") {
     echo $results;
 }
 else {
-    echo getResults($search, "WHERE name LIKE ?");
+    echo getResults($search, "WHERE name LIKE CONCAT('%',?,'%')");
 }
 
 function getAllGames() {
     global $conn;
     
-    $res = $conn->query("SELECT id, name, turn, status, round, repeat_pins, empty_pins FROM mastermind_games");
+    $res = $conn->query("SELECT id, name, round, status, repeat_pins, empty_pins FROM mastermind_games");
     
     if($res->num_rows == 0) {
         return "empty";

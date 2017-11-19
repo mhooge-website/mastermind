@@ -39,7 +39,8 @@ function updateValues() {
         echo "Prepare failed: (" . $conn->errno . ") " . $conn->error;
     }
 
-    if (!$stmt->bind_param("sisiis", $jsonGame->name, $jsonGame->turn, $jsonGame->status, $jsonGame->round, $jsonGame->repeat, $jsonGame->empty, $id)) {
+    if (!$stmt->bind_param("sisiiis", $jsonGame->name, $jsonGame->turn, $jsonGame->status, $jsonGame->round, $jsonGame->repeat, 
+    $jsonGame->empty, $jsonGame->id)) {
         http_response_code(500);
         echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
     }
@@ -48,10 +49,26 @@ function updateValues() {
         http_response_code(500);
         echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
     }
+    http_response_code(204);
 }
 
 function deleteGame() {
+    global $conn, $jsonGame;
+    if (!($stmt = $conn->prepare("DELETE FROM mastermind_games WHERE id=?"))) {
+        http_response_code(500);
+        echo "Prepare failed: (" . $conn->errno . ") " . $conn->error;
+    }
+
+    if (!$stmt->bind_param("s", $jsonGame->id)) {
+        http_response_code(500);
+        echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+    }
     
+    if (!$stmt->execute()) {
+        http_response_code(500);
+        echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+    }
+    http_response_code(204);
 }
 
 ?>

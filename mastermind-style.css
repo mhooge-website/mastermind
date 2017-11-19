@@ -13,12 +13,33 @@
     width: 100%;
 }
 
-#game-div-guesser {
+#game-div-mastermind, #game-div-guesser {
     display: none;
+    width: 50%;
 }
 
-#game-div-mastermind {
-    display: none;
+#game-div-mastermind, #game-div-guesser > div {
+    column-count: 2;
+}
+
+.guesses-div {
+    width: 75%;
+}
+
+.results-div {
+    width: 25%;
+}
+
+.guesses-div > div {
+    column-count: 4;
+    column-width: 20px;
+    padding-bottom: 5px;
+}
+
+.results-div > div {
+    column-count: 2;
+    column-gap: 0px;
+    padding-bottom: 5px;
 }
 
 #search-game-div {
@@ -39,6 +60,7 @@
 .search-result-div {
     text-align: center;
     display: block;
+    margin-bottom: 10px;
     column-count: 7;
     column-rule-style: solid;
     column-rule-color: black;
@@ -58,6 +80,7 @@
 }
 
 #edit-game-name {
+    text-align: center;
     float: right;
 }
 
