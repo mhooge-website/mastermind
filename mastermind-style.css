@@ -13,13 +13,26 @@
     width: 100%;
 }
 
+#game-div {
+    display: none;
+    position: relative;
+    z-index: 2;
+    margin: auto;
+    
+    width: 25%;
+    
+}
+
 #game-div-mastermind, #game-div-guesser {
     display: none;
-    margin: auto;
+    border-style: solid;
+    position: relative;
+    z-index: 2;
+    border-color: black;
     background-color: #919191;
-    width: 25%;
     padding-top: 5px;
     padding-bottom: 1px;
+    margin-bottom: 10px;
 }
 
 .rows-div {
@@ -96,59 +109,54 @@
     height: 13%;
 }
 
-.action-div {
+#action-div {
     width: 120px;
     margin: auto;
     text-align: center;
 }
 
 #color-bw-div {
-    height: 40px;
-}
-
-#color-all-div {
-    height: 200px;
+    left: 100%;
+    right: 0%;
 }
 
 #color-all-div, #color-bw-div {
     width: 60px;
     position: absolute;
+    border-style: outset;
+    background-color: gray;
+    display: none;
+    
+    height: fit-content;
+    z-index: 0;
 
+    top: 0; bottom: 0;
     margin: auto;
     vertical-align: center;
 
     animation-duration: 0.5s;
-    animation-direction: alternate;
-    opacity: 1;
+    animation-fill-mode: forwards;
 }
 
 #color-all-div > button, #color-bw-div > button {
-    width: 50px;
+    width: 100%;
     height: 50px;
 }
 
 @keyframes color-popup-right {
     0% {
-        opacity: 1;
-    }
-    99% {
-        opacity: 1;
+        transform: translateX(-100%);
     }
     100% {
-        opacity: 0;
-        transform: translateX(100%);
+        transform: translateX(0%);
     }
 }
 
 @keyframes color-popup-left {
     0% {
-        opacity: 1;
-    }
-    99% {
-        opacity: 1;
+        transform: translateX(0%);
     }
     100% {
-        opacity: 0;
         transform: translateX(-100%);
     }
 }

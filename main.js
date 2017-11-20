@@ -1,11 +1,11 @@
-var isMastermind = true;
+var isMastermind = false;
 var isOnline = false;
 var gameId;
 var name;
 var turn;
 var status;
 var round;
-var repeatPins = false;
+var repeatPins = true;
 var emptyPins = false;
 const debug = true;
 
