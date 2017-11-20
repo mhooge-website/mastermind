@@ -1,4 +1,4 @@
-var isMastermind = false;
+var isMastermind = true;
 var isOnline = false;
 var gameId;
 var name;

@@ -5,7 +5,7 @@
 #startup-div {
     margin: auto;
     text-align: center;
-    width: 200px;
+    width: 300px;
 }
 
 #startup-div > label {
@@ -15,31 +15,142 @@
 
 #game-div-mastermind, #game-div-guesser {
     display: none;
-    width: 50%;
+    margin: auto;
+    background-color: #919191;
+    width: 25%;
+    padding-top: 5px;
+    padding-bottom: 1px;
 }
 
-#game-div-mastermind, #game-div-guesser > div {
-    column-count: 2;
+.rows-div {
+    height: 89%;
+}
+
+#g-guesses-div {
+    float: right;
+}
+
+#g-results-div {
+    margin-left: 10px;
+}
+
+#m-results-div {
+    float: right;
+}
+
+#m-guesses-div {
+    margin-left: 10px;
+    margin-top: 7px;
+}
+
+#m-code-div {
+    margin-left: 10px;
 }
 
 .guesses-div {
-    width: 75%;
+    width: 70%;
+    height: 85%;
 }
 
 .results-div {
     width: 25%;
+    height: 88%;
 }
 
 .guesses-div > div {
-    column-count: 4;
-    column-width: 20px;
-    padding-bottom: 5px;
+    height: 9%;
+    margin-bottom: 12px;
 }
 
 .results-div > div {
-    column-count: 2;
-    column-gap: 0px;
-    padding-bottom: 5px;
+    display: block;
+    height: 9%;
+    margin-bottom: 10px;
+}
+
+.results-div > div > button {
+    width: 32%;
+    height: 45%;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.guesses-div > div > button {
+    width: 22%;
+    height: 100%;
+    margin-right: 4px;
+}
+
+.code-button {
+    width: 22%;
+    height: 65%;
+    margin-right: 4px;
+}
+
+.results-div > div > button, .guesses-div > div > button, .code-button {
+    background-color: rgb(194, 194, 194);
+}
+
+.code-div {
+    width: 100%;
+    height: 13%;
+}
+
+.action-div {
+    width: 120px;
+    margin: auto;
+    text-align: center;
+}
+
+#color-bw-div {
+    height: 40px;
+}
+
+#color-all-div {
+    height: 200px;
+}
+
+#color-all-div, #color-bw-div {
+    width: 60px;
+    position: absolute;
+
+    margin: auto;
+    vertical-align: center;
+
+    animation-duration: 0.5s;
+    animation-direction: alternate;
+    opacity: 1;
+}
+
+#color-all-div > button, #color-bw-div > button {
+    width: 50px;
+    height: 50px;
+}
+
+@keyframes color-popup-right {
+    0% {
+        opacity: 1;
+    }
+    99% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+@keyframes color-popup-left {
+    0% {
+        opacity: 1;
+    }
+    99% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
 }
 
 #search-game-div {
