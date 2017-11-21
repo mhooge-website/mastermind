@@ -1,4 +1,4 @@
-var isMastermind = false;
+var isMastermind = true;
 var isOnline = false;
 var gameId;
 var name;
@@ -7,6 +7,8 @@ var status;
 var round;
 var repeatPins = true;
 var emptyPins = false;
+var masterCode;
+
 const debug = true;
 
 function hideWindow(id) {
@@ -33,10 +35,12 @@ function unpackFromJSON(json) {
     repeatPins = arr[0][5] == 1;
     emptyPins = arr[0][6] == 1;
     isMastermind = arr[0][7] == 1;
+    masterCode = arr[0][8];
 }
 
 function packToJSON() {
-    let gameInfo = { "id":gameId, "name":name, "turn":turn ? 1 : 0, "status":status, "round": round, "repeat":repeatPins ? 1 : 0, "empty":emptyPins ? 1 : 0 };
+    let gameInfo = { "id":gameId, "name":name, "turn":turn ? 1 : 0, "status":status, "round": round, "repeat":repeatPins ? 1 : 0, "empty":emptyPins ? 1 : 0, 
+    "creator":isMastermind, "code":masterCode };
     
     return JSON.stringify(gameInfo);
 }

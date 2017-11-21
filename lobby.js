@@ -50,6 +50,7 @@ function setInitialPVPValues() {
 function setInitialSharedValues() {
     turn = MASTERMIND_TURN;
     round = 0;
+    masterCode = null;
 }
 
 function createPVPGame() {
@@ -151,6 +152,7 @@ function joinLobby(id) {
 
         console.log(this.responseText);
         unpackFromJSON(this.responseText);
+        isMastermind = !isMastermind;
         swapWindow("search-game-div", "pvp-setup-div");
         updateLobbyValues();
         lockLobby();

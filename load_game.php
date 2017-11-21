@@ -35,7 +35,7 @@ function getAllGames() {
 
 function getResults($search, $where) {
     global $stmt, $conn;
-    if (!($stmt = $conn->prepare("SELECT * FROM mastermind_games " . $where))) {
+    if (!($stmt = $conn->prepare("SELECT id, name, round, status, repeat_pins, empty_pins, creator_mastermind, code FROM mastermind_games " . $where))) {
         http_response_code(500);
         echo "Prepare failed: (" . $conn->errno . ") " . $conn->error;
         die;

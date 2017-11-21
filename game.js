@@ -1,4 +1,8 @@
 const MASTERMIND_TURN = true;
+const buttonBG = "rgb(194, 194, 194)";
+const buttonDisabled = "rgb(102, 102, 102)";
+const pinColors = ["black", "white", "red", "#00b359", "#0099ff", "#ffff66"];
+
 var codeButtons = null;
 var guessButtons = null;
 var resultButtons = null;
@@ -6,7 +10,7 @@ var colorButtons = null;
 var bwButtons = null;
 
 function createGame() {
-    document.getElementById("game-div").style.height = (window.outerHeight*0.6) + "px";
+    document.getElementById("game-div").style.height = (window.innerHeight-300) + "px";
     codeButtons = new Array(4);
     guessButtons = new Array(10);
     resultButtons = new Array(10);
@@ -16,13 +20,13 @@ function createGame() {
     else createGuesserWindow();
     createColorDiv();
     createBWColorDiv();
-    resizeButtons();
-    document.addEventListener("resize", resizeButtons);
+    setButtonSizes();
 }
 
 function createMastermindWindow() {
     createMastermindDiv();
     createCodeArea();
+    setReadyAction(masterCodeSet);
 
     document.getElementById("game-div-mastermind").style.display = "block";
     swapWindow("pvp-setup-div", "game-div");
@@ -30,25 +34,22 @@ function createMastermindWindow() {
 
 function createGuesserWindow() {
     createGuesserDiv();
+    setReadyAction(guessPlaced);
 
     document.getElementById("game-div-guesser").style.display = "block";
     swapWindow("pvp-setup-div", "game-div");
+
+    checkGuesserUpdate();
 }
 
 function createCodeArea() {
+    let gameDiv = document.getElementById("game-div");
     let row = document.getElementById("m-code-div");
     let button = document.getElementById("code-button");
 
     for(let i = 0; i < 4; i++) {
         let buttonClone = button.cloneNode();
-        let buttonObj = {
-            button: buttonClone,
-            color: "rgb(194, 194, 194)",
-            setColor: function(c) {
-                this.color = c;
-                this.button.style.backgroundColor = c;
-            }
-        };
+        let buttonObj = createButtonObj(buttonClone, buttonBG);
         buttonObj.button.onclick = (e) => {
             showColorSelection(codeButtonSelected, buttonObj);
         }
@@ -74,29 +75,18 @@ function createGuesserDiv() {
         for(let j = 0; j < 4; j++) {
             let gButtonClone = guessButton.cloneNode();
             let rButtonClone = resultButton.cloneNode();
-            let buttonObj = {
-                button: gButtonClone,
-                color: "rgb(194, 194, 194)",
-                setColor: function(c) {
-                    this.color = c;
-                    this.button.style.backgroundColor = c;
-                }
-            };
+            let buttonObj = createButtonObj(gButtonClone, buttonBG);
             buttonObj.button.onclick = () => {
                 showColorSelection(guessButtonSelected, buttonObj);
             }
+            buttonObj.setDisabled(true);
+            let altObject = createButtonObj(rButtonClone, buttonBG);
+            altObject.setDisabled(true);
             
             gRowClone.appendChild(gButtonClone);
             rRowClone.appendChild(rButtonClone);
             guessButtons[i][j] = buttonObj;
-            resultButtons[i][j] = {
-                button: rButtonClone,
-                color: "rgb(194, 194, 194)",
-                setColor: function(c) {
-                    this.color = c;
-                    this.button.style.backgroundColor = c;
-                }
-            };
+            resultButtons[i][j] = altObject;
         }
         guessesDiv.appendChild(gRowClone);
         resultsDiv.appendChild(rRowClone);
@@ -108,6 +98,7 @@ function createGuesserDiv() {
 }
 
 function createMastermindDiv() {
+    let gameDiv = document.getElementById("game-div");
     let guessesDiv = document.getElementById("m-guesses-div");
     let resultsDiv = document.getElementById("m-results-div"); 
     let guessRow = document.getElementById("m-guesses-row");
@@ -123,28 +114,18 @@ function createMastermindDiv() {
         for(let j = 0; j < 4; j++) {
             let gButtonClone = guessButton.cloneNode();
             let rButtonClone = resultButton.cloneNode();
-            let buttonObj = {
-                button: rButtonClone,
-                color: "rgb(194, 194, 194)",
-                setColor: function(c) {
-                    this.color = c;
-                    this.button.style.backgroundColor = c;
-                }
-            };
+            
+            let buttonObj = createButtonObj(rButtonClone, buttonBG);
             buttonObj.button.onclick = () => {
                 showBWColorSelection(resultButtonSelected, buttonObj);
             }
+            buttonObj.setDisabled(true);
+            let altObject = createButtonObj(gButtonClone, buttonBG);
+            altObject.setDisabled(true);
 
             gRowClone.appendChild(gButtonClone);
             rRowClone.appendChild(rButtonClone);
-            guessButtons[i][j] = {
-                button: gButtonClone,
-                color: "rgb(194, 194, 194)",
-                setColor: function(c) {
-                    this.color = c;
-                    this.button.style.backgroundColor = c;
-                }
-            };
+            guessButtons[i][j] = altObject;
             resultButtons[i][j] = buttonObj;
         }
         guessesDiv.appendChild(gRowClone);
@@ -156,25 +137,96 @@ function createMastermindDiv() {
     resultsDiv.removeChild(resultRow);
 }
 
-function resizeButtons() {
+function createButtonObj(btn, clr) {
+    return {
+        button: btn,
+        color: clr,
+        setColor: function(c) {
+            this.color = c;
+            this.button.style.backgroundColor = c;
+        },
+        setDisabled: function(disabled) {
+            this.button.disabled = disabled;
+            if(disabled) this.button.style.backgroundColor = buttonDisabled;
+            else this.button.style.backgroundColor = this.color;
+        },
+        equalColor: function(otherButton) {
+            return this.color == otherButton.color;
+        }
+    }
+}
+
+function getColorAsIndex(color) {
+    if(color == buttonBG) return -1;
+    return pinColors.indexOf(color);
+}
+
+function enableCurrentRow() {
+    if(isMastermind) {
+        for(i = 0; i < resultButtons[round].length; i++) {
+            resultButtons[round][i].setDisabled(false);
+        }
+    }
+    else {
+        for(i = 0; i < guessButtons[9-round].length; i++) {
+            guessButtons[9-round][i].setDisabled(false);
+        }
+    }
+}
+
+function setButtonSizes() {
     let gameDiv = document.getElementById("game-div");
-    for(i = 0; i < codeButtons.length; i++) {
-        
+    if(isMastermind) {
+        for(i = 0; i < codeButtons.length; i++) {
+            let size = gameDiv.offsetHeight * 0.093;
+            codeButtons[i].button.style.width = size + "px";
+            codeButtons[i].button.style.height = size + "px";
+        }
     }
     for(i = 0; i < guessButtons.length; i++) {
         for(j = 0; j < guessButtons[i].length; j++) {
-            let size = gameDiv.offsetHeight * 0.09;
+            let size = gameDiv.offsetHeight * 0.065;
             guessButtons[i][j].button.style.width = size + "px";
             guessButtons[i][j].button.style.height = size + "px";
         }
     }
     for(i = 0; i < resultButtons.length; i++) {
         for(j = 0; j < resultButtons[i].length; j++) {
-            let size = gameDiv.offsetHeight * 0.05;
+            let size = gameDiv.offsetHeight * 0.0323;
             resultButtons[i][j].button.style.width = size + "px";
             resultButtons[i][j].button.style.height = size + "px";
         }
     }
+}
+
+function setReadyAction(action) {
+    document.getElementById("play-button").onclick = () => {
+        action();
+    }
+}
+
+function guessPlaced() {
+    saveGuessToDB();
+    round++;
+    turn = !turn;
+    saveGameToDB();
+}
+
+function resultPlaced() {
+    saveResultToDB();
+    turn = !turn;
+    saveGameToDB();
+}
+
+function masterCodeSet() {
+    let code = "";
+    for(i = 0; i < codeButtons.length; i++) {
+        code += getColorAsIndex(codeButtons[i].color);
+    }
+    masterCode = code;
+    turn = !turn;
+    saveGameToDB();
+    checkMastermindUpdate();
 }
 
 function codeButtonSelected(button, color) {
@@ -194,6 +246,7 @@ function resultButtonSelected(button, color) {
 
 function guessButtonSelected(button, color) {
     colorButton(button, color);
+    let readyButton = document.getElementById("ready-button");
     if(emptyPins) readyButton.disabled = false;
     else {
         let done = true;
@@ -212,11 +265,10 @@ function createColorDiv() {
         div.style.left = "0%";
     }
     else div.style.left = "100%";
-    const colors = ["black", "white", "red", "#00b359", "#0099ff", "#ffff66"];
 
     for(let i = 0; i < 6; i++) {
         let button = document.createElement("button");
-        button.style.backgroundColor = colors[i];
+        button.style.backgroundColor = pinColors[i];
 
         colorButtons[i] = button;
 
@@ -296,4 +348,124 @@ function hideColorSelection() {
 
 function hideBWColorSelection() {
     document.getElementById("color-bw-div").style.animationName = "color-popup-left";
+}
+
+function checkGuesserUpdate() {
+
+}
+
+function checkMastermindUpdate() {
+
+}
+
+function guessesLoaded(guesses) {
+    for(i = 0; i < guesses.length; i++) {
+
+    }
+}
+
+function resultsLoaded(results) {
+    
+}
+
+function loadGuessesFromDB() {
+    var http = new XMLHttpRequest();
+    
+    http.onreadystatechange = function() {
+        let valid = checkValidity(this);
+        if(valid == "wait") return;
+        else if(valid == "error") {
+            console.log("Error: " + this.responseText);
+            return;
+        }
+        else if(valid == "empty") {
+            console.log("Empty");
+            return;
+        }
+        guessesLoaded(JSON.parse(this.responseText));
+    };
+
+    http.open("POST", "/projects/mastermind/load_guesses.php", true);
+    http.send("id=" + gameId);
+}
+
+function loadResultsFromDB() {
+    var http = new XMLHttpRequest();
+    
+    http.onreadystatechange = function() {
+        let valid = checkValidity(this);
+        if(valid == "wait") return;
+        else if(valid == "error") {
+            console.log("Error: " + this.responseText);
+            return;
+        }
+        else if(valid == "empty") {
+            console.log("Empty");
+            return;
+        }
+        resultsLoaded(JSON.parse(this.responseText));
+    };
+
+    http.open("POST", "/projects/mastermind/load_results.php", true);
+    http.send("id=" + gameId);
+}
+
+function getCurrentGuess() {
+    let guess = "";
+    for(i = 0; i < guessButtons[9-round].length; i++) {
+        guess += getColorAsIndex(guessButtons[9-round][i].color);
+    }
+
+    return guess;
+}
+
+function getCurrentResult() {
+    let result = "";
+    for(i = 0; i < resultButtons[round].length; i++) {
+        result += getColorAsIndex(resultButtons[round][i].color);
+    }
+
+    return result;
+}
+
+function packGuessToJSON() {
+    return { "gameId":gameId, "guess": getCurrentGuess() };
+}
+
+function packResultToJSON() {
+    return { "gameId":gameId, "result": getCurrentResult() };
+}
+
+function saveGuessToDB() {
+    var http = new XMLHttpRequest();
+    let jsonMsg = packGuessToJSON();
+
+    http.onreadystatechange = function() {
+        let valid = checkValidity(this);
+        if(valid == "wait") return;
+        else if(valid == "error") {
+            console.log("Error: " + this.responseText);
+            return;
+        }
+    };
+
+    http.open("POST", "/projects/mastermind/save_guesses.php", true);
+    http.send("guess=" + jsonMsg);
+}
+
+function saveResultToDB() {
+    var http = new XMLHttpRequest();
+    let jsonMsg = packResultToJSON();
+
+    http.onreadystatechange = function() {
+        let valid = checkValidity(this);
+        if(valid == "wait") return;
+        else if(valid == "error") {
+            console.log("Error: " + this.responseText);
+            return;
+        }
+    };
+
+    http.open("POST", "/projects/mastermind/save_results.php", true);
+    http.send("result=" + jsonMsg);
 }

@@ -19,7 +19,7 @@
     z-index: 2;
     margin: auto;
     
-    height: 70%;    
+    width: 280px;
 }
 
 #game-div-mastermind, #game-div-guesser {
@@ -32,10 +32,9 @@
     padding-top: 5px;
     padding-bottom: 1px;
     margin-bottom: 10px;
-}
+    width: 100%;
 
-.rows-div {
-
+    height: inherit;
 }
 
 #g-guesses-div {
@@ -64,14 +63,23 @@
     margin-bottom: 12px;
 }
 
+.rows-div {
+    width: 100%;
+}
+
+.results-div {
+    width: 20%;
+}
+
 .results-div > div {
+    width: 100%;
     display: block;
     margin-bottom: 10px;
 }
 
 .results-div > div > button {
-    margin-right: 5px;
-    margin-bottom: 5px;
+    margin-right: 2px;
+    margin-bottom: 2px;
 }
 
 .guesses-div > div > button {
