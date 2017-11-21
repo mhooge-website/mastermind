@@ -6,8 +6,7 @@ var colorButtons = null;
 var bwButtons = null;
 
 function createGame() {
-    document.getElementById("game-div-mastermind").style.height = (window.innerHeight*0.7) + "px";
-    document.getElementById("game-div-guesser").style.height = (window.innerHeight*0.7) + "px";
+    document.getElementById("game-div").style.height = (window.outerHeight*0.6) + "px";
     codeButtons = new Array(4);
     guessButtons = new Array(10);
     resultButtons = new Array(10);
@@ -17,6 +16,8 @@ function createGame() {
     else createGuesserWindow();
     createColorDiv();
     createBWColorDiv();
+    resizeButtons();
+    document.addEventListener("resize", resizeButtons);
 }
 
 function createMastermindWindow() {
@@ -153,6 +154,27 @@ function createMastermindDiv() {
     resultRow.removeChild(resultButton);
     guessesDiv.removeChild(guessRow);
     resultsDiv.removeChild(resultRow);
+}
+
+function resizeButtons() {
+    let gameDiv = document.getElementById("game-div");
+    for(i = 0; i < codeButtons.length; i++) {
+        
+    }
+    for(i = 0; i < guessButtons.length; i++) {
+        for(j = 0; j < guessButtons[i].length; j++) {
+            let size = gameDiv.offsetHeight * 0.09;
+            guessButtons[i][j].button.style.width = size + "px";
+            guessButtons[i][j].button.style.height = size + "px";
+        }
+    }
+    for(i = 0; i < resultButtons.length; i++) {
+        for(j = 0; j < resultButtons[i].length; j++) {
+            let size = gameDiv.offsetHeight * 0.05;
+            resultButtons[i][j].button.style.width = size + "px";
+            resultButtons[i][j].button.style.height = size + "px";
+        }
+    }
 }
 
 function codeButtonSelected(button, color) {
