@@ -1,12 +1,13 @@
-var isMastermind = true;
+var isMastermind;
 var isOnline = false;
 var gameId;
 var name;
 var turn;
 var status;
 var round;
-var repeatPins = true;
-var emptyPins = false;
+var repeatPins;
+var emptyPins;
+var creatorMastermind;
 var masterCode;
 
 const debug = true;
@@ -34,13 +35,13 @@ function unpackFromJSON(json) {
     round = arr[0][4];
     repeatPins = arr[0][5] == 1;
     emptyPins = arr[0][6] == 1;
-    isMastermind = arr[0][7] == 1;
+    creatorMastermind = arr[0][7] == 1;
     masterCode = arr[0][8];
 }
 
 function packToJSON() {
     let gameInfo = { "id":gameId, "name":name, "turn":turn ? 1 : 0, "status":status, "round": round, "repeat":repeatPins ? 1 : 0, "empty":emptyPins ? 1 : 0, 
-    "creator":isMastermind, "code":masterCode };
+    "creator":creatorMastermind, "code":masterCode };
     
     return JSON.stringify(gameInfo);
 }
@@ -74,7 +75,7 @@ function prepareLoad(id) {
 }
 
 function loadGameFromDB(id) {
-    let http = prepareLoad();
+    let http = prepareLoad(id);
     http.onreadystatechange = function() {
         let valid = checkValidity(this);
         if(valid == "wait") return;
@@ -86,9 +87,7 @@ function loadGameFromDB(id) {
             return "empty";
         }
 
-        unpackFromJSON(JSON.parse(this.responseText));
-        console.log("LOADED:");
-        for(i = 0; i < arr[0].length; i++) console.log(arr[0][i]);
+        unpackFromJSON(this.responseText);
     };
     http.send();
 }

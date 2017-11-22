@@ -10,7 +10,8 @@ var colorButtons = null;
 var bwButtons = null;
 
 function createGame() {
-    document.getElementById("game-div").style.height = (window.innerHeight-300) + "px";
+    console.log("Master: " + isMastermind);
+    document.getElementById("game-div").style.height = (window.outerHeight-380) + "px";
     codeButtons = new Array(4);
     guessButtons = new Array(10);
     resultButtons = new Array(10);
@@ -21,6 +22,7 @@ function createGame() {
     createColorDiv();
     createBWColorDiv();
     setButtonSizes();
+    document.getElementById("exit-button").onclick = exitGame;
 }
 
 function createMastermindWindow() {
@@ -43,7 +45,6 @@ function createGuesserWindow() {
 }
 
 function createCodeArea() {
-    let gameDiv = document.getElementById("game-div");
     let row = document.getElementById("m-code-div");
     let button = document.getElementById("code-button");
 
@@ -200,7 +201,7 @@ function setButtonSizes() {
 }
 
 function setReadyAction(action) {
-    document.getElementById("play-button").onclick = () => {
+    document.getElementById("ready-button").onclick = () => {
         action();
     }
 }
@@ -268,9 +269,7 @@ function createColorDiv() {
 
     for(let i = 0; i < 6; i++) {
         let button = document.createElement("button");
-        button.style.backgroundColor = pinColors[i];
-
-        colorButtons[i] = button;
+        colorButtons[i] = createButtonObj(button, pinColors[i]);
 
         div.appendChild(button);
     }
@@ -282,9 +281,7 @@ function createBWColorDiv() {
 
     for(let i = 0; i < 2; i++) {
         let button = document.createElement("button");
-        button.style.backgroundColor = colors[i];
-
-        bwButtons[i] = button;
+        bwButtons[i] = createButtonObj(button, pinColors[i]);
 
         div.appendChild(button);
     }
@@ -311,14 +308,14 @@ function showColorSelection(func, selectedButton) {
 
     for(let i = 0; i < colorButtons.length; i++) {
         let button = colorButtons[i];
-        if(repeatPins && checkIsRepeated(button.style.backgroundColor)) {
-            button.disabled = true;
+        if(!repeatPins && checkIsRepeated(button.color)) {
+            button.setDisabled(true);
             continue;
         }
-        button.disabled = false;
+        button.setDisabled(false);
 
-        button.onclick = () => {
-            func(selectedButton, button.style.backgroundColor);
+        button.button.onclick = () => {
+            func(selectedButton, button.color);
             hideColorSelection();
         }
     }
@@ -329,8 +326,8 @@ function showColorSelection(func, selectedButton) {
 
 function showBWColorSelection(func, selectedButton) {
     for(let i = 0; i < bwButtons.length; i++) {
-        bwButtons[i].onclick = () => {
-            func(selectedButton, bwButtons[i].style.backgroundColor);
+        bwButtons[i].button.onclick = () => {
+            func(selectedButton, bwButtons[i].color);
             hideBWColorSelection();
         }
     }
@@ -350,26 +347,72 @@ function hideBWColorSelection() {
     document.getElementById("color-bw-div").style.animationName = "color-popup-left";
 }
 
-function checkGuesserUpdate() {
+function exitGame() {
 
+}
+
+function checkGuesserUpdate() {
+    setInterval(() => {
+        if(round > 0) {
+            loadResultsFromDB();
+        }
+        else {
+            let http = prepareLoad(gameId);
+            http.onreadystatechange = function() {
+                if(this.readyState == 4) {
+                    if(this.status == 200) {
+                        unpackFromJSON(this.responseText);
+                        console.log(masterCode);
+                        if(masterCode != null) {
+                            enableCurrentRow();
+                        }
+                    }
+                    else if(this.status == 500) {
+                        console.log(this.responseText);
+                    }
+                }
+            };
+            http.send();
+        }
+    }, 1000);
 }
 
 function checkMastermindUpdate() {
-
+    setInterval(() => {
+        let currentRound = round;
+        loadGameFromDB(gameId);
+        if(currentRound != round) {
+            loadGuessesFromDB();
+            enableCurrentRow();
+        }
+    }, 1000);
 }
 
 function guessesLoaded(guesses) {
-    for(i = 0; i < guesses.length; i++) {
-
+    for(i = 0; i < guesses[round]; i++) {
+        let color = pinColors[guesses[round][i].charAt(i)];
+        colorButton(guessButtons[round][i], color);
     }
 }
 
 function resultsLoaded(results) {
-    
+    if(results.length == round) {
+        for(i = 0; i < results[round-1]; i++) {
+            let color = pinColors[results[round-1][i].charAt(i)];
+            colorButton(resultButtons[round-1][i], color);
+        }
+    }
+}
+
+function prepareLoadGuesses() {
+    var http = new XMLHttpRequest();
+    http.open("POST", "/projects/mastermind/load_guesses.php", true);
+
+    return http;
 }
 
 function loadGuessesFromDB() {
-    var http = new XMLHttpRequest();
+    let http = prepareLoadGuesses();
     
     http.onreadystatechange = function() {
         let valid = checkValidity(this);
@@ -385,12 +428,19 @@ function loadGuessesFromDB() {
         guessesLoaded(JSON.parse(this.responseText));
     };
 
-    http.open("POST", "/projects/mastermind/load_guesses.php", true);
+    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     http.send("id=" + gameId);
 }
 
-function loadResultsFromDB() {
+function prepareLoadResults() {
     var http = new XMLHttpRequest();
+    http.open("POST", "/projects/mastermind/load_results.php", true);
+
+    return http;
+}
+
+function loadResultsFromDB() {
+    var http = prepareLoadResults();
     
     http.onreadystatechange = function() {
         let valid = checkValidity(this);
@@ -406,7 +456,7 @@ function loadResultsFromDB() {
         resultsLoaded(JSON.parse(this.responseText));
     };
 
-    http.open("POST", "/projects/mastermind/load_results.php", true);
+    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     http.send("id=" + gameId);
 }
 
@@ -450,6 +500,7 @@ function saveGuessToDB() {
     };
 
     http.open("POST", "/projects/mastermind/save_guesses.php", true);
+    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     http.send("guess=" + jsonMsg);
 }
 
@@ -467,5 +518,6 @@ function saveResultToDB() {
     };
 
     http.open("POST", "/projects/mastermind/save_results.php", true);
+    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     http.send("result=" + jsonMsg);
 }

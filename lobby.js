@@ -1,5 +1,5 @@
 function setMastermind(id) {
-    isMastermind = document.getElementById(id).checked;
+    creatorMastermind = document.getElementById(id).checked;
     saveGameToDB();
 }
 
@@ -48,15 +48,23 @@ function setInitialPVPValues() {
 }
 
 function setInitialSharedValues() {
+    creatorMastermind = true;
     turn = MASTERMIND_TURN;
     round = 0;
     masterCode = null;
+    repeatPins = false;
+    emptyPins = false;
+
+    document.getElementById("check-mastermind").checked = creatorMastermind;
+    document.getElementById("check-repeat").checked = repeatPins;
+    document.getElementById("check-empty").checked = emptyPins;
 }
 
 function createPVPGame() {
     setInitialPVPValues();
 
     if(debug) {
+        isMastermind = true;
         createGame();
         return;
     }
@@ -88,7 +96,7 @@ function addStartGameButton() {
     startButton.textContent = "Play";
     startButton.onclick = function() {
         status = "underway";
-        isMastermind = !isMastermind;
+        isMastermind = creatorMastermind;
         saveGameToDB();
         createGame();
     };
@@ -152,7 +160,6 @@ function joinLobby(id) {
 
         console.log(this.responseText);
         unpackFromJSON(this.responseText);
-        isMastermind = !isMastermind;
         swapWindow("search-game-div", "pvp-setup-div");
         updateLobbyValues();
         lockLobby();
@@ -180,13 +187,12 @@ function waitForStart() {
             unpackFromJSON(this.responseText);
 
             if(status == "underway") {
+                isMastermind = !creatorMastermind;
                 createGame();
                 clearInterval(interval);
             }
             else if(status == "lobby") {
                 document.getElementById("status-text").innerHTML = "Lobby leader left the lobby,<br>you are now the leader.";
-                // startWaiting();
-                // unlockLobby();
                 clearInterval(interval);
             }
             else if(status == "dead") {
@@ -205,7 +211,7 @@ function lockLobby() {
 }
 
 function updateLobbyValues() {
-    document.getElementById("check-mastermind").checked = isMastermind;
+    document.getElementById("check-mastermind").checked = !creatorMastermind;
     document.getElementById("game-name").value = name;
     document.getElementById("game-id").textContent = gameId;
     document.getElementById("check-repeat").checked = repeatPins;

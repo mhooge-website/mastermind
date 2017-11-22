@@ -2,7 +2,7 @@
 header("Content-Type: application/json; charset=UTF-8");
 include('../../scripts/connect_db.php');
 
-$id = $_GET["id"];
+$id = $_POST["id"];
 $conn = connect_db("mhso_grpro");
 
 if (!($stmt = $conn->prepare("SELECT guess FROM mastermind_guesses WHERE game_id=?"))) {
