@@ -11,7 +11,10 @@ var bwButtons = null;
 
 function createGame() {
     console.log("Master: " + isMastermind);
-    document.getElementById("game-div").style.height = (window.outerHeight-380) + "px";
+    let height = window.outerHeight - 330;
+    document.getElementById("game-div").style.height = height + "px";
+    document.getElementById("game-div").style.width = (height * 0.5) + "px";
+    document.getElementById("ready-button").addEventListener("click", () => document.getElementById("ready-button").disabled = true);
     codeButtons = new Array(4);
     guessButtons = new Array(10);
     resultButtons = new Array(10);
@@ -23,6 +26,17 @@ function createGame() {
     createBWColorDiv();
     setButtonSizes();
     document.getElementById("exit-button").onclick = exitGame;
+    if(debug && isMastermind) {
+        colorButton(guessButtons[0][0], pinColors[0]);
+        colorButton(guessButtons[0][1], pinColors[2]);
+        colorButton(guessButtons[0][2], pinColors[4]);
+        colorButton(guessButtons[0][3], pinColors[1]);
+
+        colorButton(codeButtons[0], pinColors[0]);
+        colorButton(codeButtons[1], pinColors[3]);
+        colorButton(codeButtons[2], pinColors[1]);
+        colorButton(codeButtons[3], pinColors[4]);
+    }
 }
 
 function createMastermindWindow() {
@@ -80,9 +94,9 @@ function createGuesserDiv() {
             buttonObj.button.onclick = () => {
                 showColorSelection(guessButtonSelected, buttonObj);
             }
-            buttonObj.setDisabled(true);
+            if(!debug) buttonObj.setDisabled(true);
             let altObject = createButtonObj(rButtonClone, buttonBG);
-            altObject.setDisabled(true);
+            if(!debug) altObject.setDisabled(true);
             
             gRowClone.appendChild(gButtonClone);
             rRowClone.appendChild(rButtonClone);
@@ -120,9 +134,9 @@ function createMastermindDiv() {
             buttonObj.button.onclick = () => {
                 showBWColorSelection(resultButtonSelected, buttonObj);
             }
-            buttonObj.setDisabled(true);
+            if(!debug) buttonObj.setDisabled(true);
             let altObject = createButtonObj(gButtonClone, buttonBG);
-            altObject.setDisabled(true);
+            if(!debug) altObject.setDisabled(true);
 
             gRowClone.appendChild(gButtonClone);
             rRowClone.appendChild(rButtonClone);
@@ -139,9 +153,9 @@ function createMastermindDiv() {
 }
 
 function createButtonObj(btn, clr) {
-    return {
+    let obj = {
         button: btn,
-        color: clr,
+        color: null,
         setColor: function(c) {
             this.color = c;
             this.button.style.backgroundColor = c;
@@ -155,6 +169,8 @@ function createButtonObj(btn, clr) {
             return this.color == otherButton.color;
         }
     }
+    obj.setColor(clr);
+    return obj;
 }
 
 function getColorAsIndex(color) {
@@ -179,21 +195,21 @@ function setButtonSizes() {
     let gameDiv = document.getElementById("game-div");
     if(isMastermind) {
         for(i = 0; i < codeButtons.length; i++) {
-            let size = gameDiv.offsetHeight * 0.093;
+            let size = gameDiv.offsetHeight * 0.09;
             codeButtons[i].button.style.width = size + "px";
             codeButtons[i].button.style.height = size + "px";
         }
     }
     for(i = 0; i < guessButtons.length; i++) {
         for(j = 0; j < guessButtons[i].length; j++) {
-            let size = gameDiv.offsetHeight * 0.065;
+            let size = gameDiv.offsetHeight * 0.055;
             guessButtons[i][j].button.style.width = size + "px";
             guessButtons[i][j].button.style.height = size + "px";
         }
     }
     for(i = 0; i < resultButtons.length; i++) {
         for(j = 0; j < resultButtons[i].length; j++) {
-            let size = gameDiv.offsetHeight * 0.0323;
+            let size = gameDiv.offsetHeight * 0.034;
             resultButtons[i][j].button.style.width = size + "px";
             resultButtons[i][j].button.style.height = size + "px";
         }
@@ -230,6 +246,40 @@ function masterCodeSet() {
     checkMastermindUpdate();
 }
 
+function isResultValid() {
+    let results = new Array(4);
+    let tempArr = codeButtons;
+    for(i = 0; i < guessButtons[round].length; i++) {
+        let guess = guessButtons[round][i];
+        if(tempArr[i] == null) continue;
+        if(guess == undefined && tempArr[i] == undefined || guess.equalColor(tempArr[i].color)) {
+            results[i] = "black";
+            tempArr[i] = null;
+        }
+        else {
+            for(j = 0; j < tempArr.length; j++) {
+                if(tempArr[i] != null && guess == undefined && tempArr[i] == undefined || guess.equalColor(tempArr[i].color)) {
+                    results[i] = "white";
+                    tempArr[i] = null;
+                    break;
+                }
+            }
+        }
+    }
+    for(j = 0; j < resultButtons[round].length; j++) {
+        for(i = 0; i < results.length; i++) {
+            if(results[i] == null) continue;
+            if(resultButtons[round][j] == undefined && results[i] == undefined || resultButtons[round][j].equalColor(results[i])) {
+                results[i] == null;
+            }
+        }
+    }
+    for(i = 0; i < results.length; i++) {
+        if(results[i] != null) return false;
+    }
+    return true;
+}
+
 function codeButtonSelected(button, color) {
     colorButton(button, color);
     let readyButton = document.getElementById("ready-button");
@@ -243,6 +293,11 @@ function codeButtonSelected(button, color) {
 
 function resultButtonSelected(button, color) {
     colorButton(button, color);
+    if(isResultValid()) {
+        console.log("Valid");
+        document.getElementById("ready-button").disabled = false;
+    }
+    else console.log("Invalid");
 }
 
 function guessButtonSelected(button, color) {
@@ -277,9 +332,8 @@ function createColorDiv() {
 
 function createBWColorDiv() {
     let div = document.getElementById("color-bw-div");
-    const colors = ["black", "white"];
 
-    for(let i = 0; i < 2; i++) {
+    for(let i = 0; i < bwButtons.length; i++) {
         let button = document.createElement("button");
         bwButtons[i] = createButtonObj(button, pinColors[i]);
 
@@ -362,7 +416,6 @@ function checkGuesserUpdate() {
                 if(this.readyState == 4) {
                     if(this.status == 200) {
                         unpackFromJSON(this.responseText);
-                        console.log(masterCode);
                         if(masterCode != null) {
                             enableCurrentRow();
                         }
