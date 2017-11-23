@@ -10,7 +10,6 @@ var colorButtons = null;
 var bwButtons = null;
 
 function createGame() {
-    console.log("Master: " + isMastermind);
     let height = window.outerHeight - 330;
     document.getElementById("game-div").style.height = height + "px";
     document.getElementById("game-div").style.width = (height * 0.5) + "px";
@@ -26,16 +25,24 @@ function createGame() {
     createBWColorDiv();
     setButtonSizes();
     document.getElementById("exit-button").onclick = exitGame;
-    if(debug && isMastermind) {
-        colorButton(guessButtons[0][0], pinColors[0]);
-        colorButton(guessButtons[0][1], pinColors[2]);
-        colorButton(guessButtons[0][2], pinColors[4]);
-        colorButton(guessButtons[0][3], pinColors[1]);
-
-        colorButton(codeButtons[0], pinColors[0]);
-        colorButton(codeButtons[1], pinColors[3]);
-        colorButton(codeButtons[2], pinColors[1]);
-        colorButton(codeButtons[3], pinColors[4]);
+    if(debug) {  
+        let button = document.createElement("button");
+        let code = [
+            createButtonObj(button.cloneNode(), pinColors[0]), 
+            createButtonObj(button.cloneNode(), pinColors[1]),
+            createButtonObj(button.cloneNode(), pinColors[6]), 
+            createButtonObj(button.cloneNode(), pinColors[5])];
+        let guess = [
+            createButtonObj(button.cloneNode(), pinColors[0]), 
+            createButtonObj(button.cloneNode(), pinColors[5]),
+            createButtonObj(button.cloneNode(), pinColors[4]), 
+            createButtonObj(button.cloneNode(), pinColors[6])];
+        let result = [
+            createButtonObj(button.cloneNode(), pinColors[0]), 
+            createButtonObj(button.cloneNode(), pinColors[1]),
+            createButtonObj(button.cloneNode(), pinColors[1]), 
+            createButtonObj(button.cloneNode(), buttonBG)];
+        console.log(isResultValid(code, guess, result));
     }
 }
 
@@ -165,8 +172,11 @@ function createButtonObj(btn, clr) {
             if(disabled) this.button.style.backgroundColor = buttonDisabled;
             else this.button.style.backgroundColor = this.color;
         },
-        equalColor: function(otherButton) {
-            return this.color == otherButton.color;
+        equalColor: function(otherColor) {
+            return this.color == otherColor;
+        },
+        isEmpty: function() {
+            return this.color == buttonBG;
         }
     }
     obj.setColor(clr);
@@ -180,8 +190,8 @@ function getColorAsIndex(color) {
 
 function enableCurrentRow() {
     if(isMastermind) {
-        for(i = 0; i < resultButtons[round].length; i++) {
-            resultButtons[round][i].setDisabled(false);
+        for(i = 0; i < resultButtons[round-1].length; i++) {
+            resultButtons[round-1][i].setDisabled(false);
         }
     }
     else {
@@ -202,14 +212,14 @@ function setButtonSizes() {
     }
     for(i = 0; i < guessButtons.length; i++) {
         for(j = 0; j < guessButtons[i].length; j++) {
-            let size = gameDiv.offsetHeight * 0.055;
+            let size = gameDiv.offsetHeight * 0.06;
             guessButtons[i][j].button.style.width = size + "px";
             guessButtons[i][j].button.style.height = size + "px";
         }
     }
     for(i = 0; i < resultButtons.length; i++) {
         for(j = 0; j < resultButtons[i].length; j++) {
-            let size = gameDiv.offsetHeight * 0.034;
+            let size = gameDiv.offsetHeight * 0.0337;
             resultButtons[i][j].button.style.width = size + "px";
             resultButtons[i][j].button.style.height = size + "px";
         }
@@ -227,12 +237,14 @@ function guessPlaced() {
     round++;
     turn = !turn;
     saveGameToDB();
+    checkGuesserUpdate();
 }
 
 function resultPlaced() {
     saveResultToDB();
     turn = !turn;
     saveGameToDB();
+    checkMastermindUpdate();
 }
 
 function masterCodeSet() {
@@ -243,39 +255,45 @@ function masterCodeSet() {
     masterCode = code;
     turn = !turn;
     saveGameToDB();
+    setReadyAction(resultPlaced);
     checkMastermindUpdate();
 }
 
-function isResultValid() {
-    let results = new Array(4);
-    let tempArr = codeButtons;
-    for(i = 0; i < guessButtons[round].length; i++) {
-        let guess = guessButtons[round][i];
+function isResultValid(code, guess, results) {
+    var outcome = new Array(4);
+    var tempArr = new Array(4);
+    for(i = 0; i < tempArr.length; i++) tempArr[i] = code[i];
+    for(i = 0; i < guess.length; i++) {
+        var guessPin = guess[i];
         if(tempArr[i] == null) continue;
-        if(guess == undefined && tempArr[i] == undefined || guess.equalColor(tempArr[i].color)) {
-            results[i] = "black";
+        if(guessPin.isEmpty() && tempArr[i].isEmpty() || guessPin.equalColor(tempArr[i].color)) {
+            outcome[i] = "black";
+            console.log(i + ": black");
             tempArr[i] = null;
         }
         else {
             for(j = 0; j < tempArr.length; j++) {
-                if(tempArr[i] != null && guess == undefined && tempArr[i] == undefined || guess.equalColor(tempArr[i].color)) {
-                    results[i] = "white";
-                    tempArr[i] = null;
+                if(tempArr[j] == null) continue;
+                else if(guessPin.isEmpty() && tempArr[j].isEmpty() || guessPin.equalColor(tempArr[j].color)) {
+                    outcome[i] = "white";
+                    console.log(i + ": white");
+                    tempArr[j] = null;
                     break;
                 }
             }
         }
     }
-    for(j = 0; j < resultButtons[round].length; j++) {
-        for(i = 0; i < results.length; i++) {
-            if(results[i] == null) continue;
-            if(resultButtons[round][j] == undefined && results[i] == undefined || resultButtons[round][j].equalColor(results[i])) {
-                results[i] == null;
+    for(j = 0; j < results.length; j++) {
+        for(i = 0; i < outcome.length; i++) {
+            if(outcome[i] == null) continue;
+            if(results[j].isEmpty() && outcome[i] == undefined || results[j].equalColor(outcome[i])) {
+                outcome[i] == null;
+                break;
             }
         }
     }
-    for(i = 0; i < results.length; i++) {
-        if(results[i] != null) return false;
+    for(i = 0; i < outcome.length; i++) {
+        if(outcome[i] != null) return false;
     }
     return true;
 }
@@ -293,7 +311,7 @@ function codeButtonSelected(button, color) {
 
 function resultButtonSelected(button, color) {
     colorButton(button, color);
-    if(isResultValid()) {
+    if(isResultValid(codeButtons, guessButtons[round-1], resultButtons[round-1])) {
         console.log("Valid");
         document.getElementById("ready-button").disabled = false;
     }
@@ -402,11 +420,11 @@ function hideBWColorSelection() {
 }
 
 function exitGame() {
-
+    
 }
 
 function checkGuesserUpdate() {
-    setInterval(() => {
+    let interval = setInterval(() => {
         if(round > 0) {
             loadResultsFromDB();
         }
@@ -418,6 +436,7 @@ function checkGuesserUpdate() {
                         unpackFromJSON(this.responseText);
                         if(masterCode != null) {
                             enableCurrentRow();
+                            clearInterval(interval);
                         }
                     }
                     else if(this.status == 500) {
@@ -431,13 +450,26 @@ function checkGuesserUpdate() {
 }
 
 function checkMastermindUpdate() {
-    setInterval(() => {
-        let currentRound = round;
-        loadGameFromDB(gameId);
-        if(currentRound != round) {
-            loadGuessesFromDB();
-            enableCurrentRow();
-        }
+    let interval = setInterval(() => {
+        let http = prepareLoad(gameId);
+        http.onreadystatechange = function() {
+            if(this.readyState == 4) {
+                if(this.status == 200) {
+                    let currentRound = round;
+                    unpackFromJSON(this.responseText);
+                    if(currentRound != round) {
+                        loadGuessesFromDB();
+                        enableCurrentRow();
+                        clearInterval(interval);
+                    }
+                }
+                else if(this.status == 500) {
+                    console.log(this.responseText);
+                }
+            }
+        };
+        http.send();
+        
     }, 1000);
 }
 
@@ -449,10 +481,10 @@ function guessesLoaded(guesses) {
 }
 
 function resultsLoaded(results) {
-    if(results.length == round) {
-        for(i = 0; i < results[round-1]; i++) {
-            let color = pinColors[results[round-1][i].charAt(i)];
-            colorButton(resultButtons[round-1][i], color);
+    if(results.length == round+1) {
+        for(i = 0; i < results[round]; i++) {
+            let color = pinColors[results[round][i].charAt(i)];
+            colorButton(resultButtons[round][i], color);
         }
     }
 }
@@ -474,7 +506,7 @@ function loadGuessesFromDB() {
             console.log("Error: " + this.responseText);
             return;
         }
-        else if(valid == "empty") {
+        else if(this.responseText == "empty") {
             console.log("Empty");
             return;
         }
@@ -502,7 +534,7 @@ function loadResultsFromDB() {
             console.log("Error: " + this.responseText);
             return;
         }
-        else if(valid == "empty") {
+        else if(this.responseText == "empty") {
             console.log("Empty");
             return;
         }
@@ -532,11 +564,13 @@ function getCurrentResult() {
 }
 
 function packGuessToJSON() {
-    return { "gameId":gameId, "guess": getCurrentGuess() };
+    let json = { "id":gameId, "guess": getCurrentGuess() };
+    return JSON.stringify(json);
 }
 
 function packResultToJSON() {
-    return { "gameId":gameId, "result": getCurrentResult() };
+    let json = { "id":gameId, "result": getCurrentResult() };
+    return JSON.stringify(json);
 }
 
 function saveGuessToDB() {

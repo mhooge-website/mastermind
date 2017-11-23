@@ -217,6 +217,10 @@
     font-size: 16px;
 }
 
+#play-button {
+    margin-right: 5px;
+}
+
 #new-game-button {
     margin-bottom: 20px;
 }

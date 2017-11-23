@@ -5,13 +5,13 @@ include('../../scripts/connect_db.php');
 $id = $_POST["id"];
 $conn = connect_db("mhso_grpro");
 
-if (!($stmt = $conn->prepare("SELECT result FROM mastermind_guesses WHERE game_id=?"))) {
+if (!($stmt = $conn->prepare("SELECT result FROM mastermind_results WHERE game_id=?"))) {
     http_response_code(500);
     echo "Prepare failed: (" . $conn->errno . ") " . $conn->error;
     die;
 }
 
-if (!$stmt->bind_param("i", $id)) {
+if (!$stmt->bind_param("s", $id)) {
     http_response_code(500);
     echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
     die;
@@ -29,10 +29,10 @@ if(!($res = $stmt->get_result())) {
     die;
 }
 if($res->num_rows == 0) {
-    return "empty";
+    echo "empty";
 }
 else {
     $val = $res->fetch_all();
-    return json_encode($val);
+    echo json_encode($val);
 }
 ?>

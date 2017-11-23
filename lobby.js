@@ -17,9 +17,12 @@ function setShownID() {
     document.getElementById("game-id").innerText = "Game ID: " + gameId;
 }
 
-function exitGame() {
+function exitLobby() {
     if(status == "lobby") status = "dead";
-    else status == "lobby";
+    else status = "lobby";
+    let readyButton = document.getElementById("play-button");
+    if(readyButton != null) document.getElementById("pvp-setup-div").removeChild(readyButton);
+    
     saveGameToDB();
 }
 
@@ -92,6 +95,7 @@ function createPVPGame() {
 
 function addStartGameButton() {
     let startButton = document.createElement("button");
+    startButton.id = "play-button";
     startButton.className = "btn btn-primary";
     startButton.textContent = "Play";
     startButton.onclick = function() {
@@ -102,13 +106,12 @@ function addStartGameButton() {
     };
 
     let setupDiv = document.getElementById("pvp-setup-div");
-    setupDiv.insertBefore(startButton, setupDiv.lastChild);
+    setupDiv.insertBefore(startButton, document.getElementById("exit-lobby-button"));
 }
 
 function waitForJoin() {
     let statusLabel = document.getElementById("status-text");
     var dots = 0;
-    let originalText = statusLabel.innerText;
     var interval = setInterval(() => {
         statusLabel.innerText = statusLabel.innerText + ".";
         dots++;
@@ -117,32 +120,63 @@ function waitForJoin() {
             dots = 0;
         }
 
-        let http = prepareLoad(gameId);
-        http.onreadystatechange = function() {
-            let valid = checkValidity(this);
-            if(valid == "wait") return;
-            else if(valid == "error") {
-                console.log("Error!");
-                return;
-            }
-            else if(this.responseText == "empty") {
-                return "empty";
-            }
-    
-            unpackFromJSON(this.responseText);
-
-            if(status == "full") {
-                document.getElementById("status-text").innerHTML = "Someone joined! Press 'Play'<br>to start the game.";
-                addStartGameButton();
-                clearInterval(interval);
-            }
-            else if(status == "dead") {
-                clearInterval(interval);
-            }
-        };
-        http.send();
+        loadAndWait(checkJoined, interval);
         
     }, 1000);
+}
+
+function loadAndWait(func, interval) {
+    let http = prepareLoad(gameId);
+    http.onreadystatechange = function() {
+        let valid = checkValidity(this);
+        if(valid == "wait") return;
+        else if(valid == "error") {
+            console.log("Error!");
+            return;
+        }
+        else if(this.responseText == "empty") {
+            return "empty";
+        }
+
+        unpackFromJSON(this.responseText);
+        func(interval);
+    }
+    http.send();
+}
+
+function checkJoined(interval) {
+    if(status == "full") {
+        document.getElementById("status-text").innerHTML = "Someone joined! Press 'Play'<br>to start the game.";
+        addStartGameButton();
+        
+        var ded = setInterval(() => {
+            loadAndWait(checkDead, ded);
+        }, 1000);
+        clearInterval(interval);
+    }
+}
+
+function checkDead(interval) {
+    if(status == "underway" || status == "dead") {
+        clearInterval(interval);
+    }
+}
+
+function checkStarted(interval) {
+    if(status == "underway") {
+        isMastermind = !creatorMastermind;
+        createGame();
+        clearInterval(interval);
+    }
+    else if(status == "lobby") {
+        document.getElementById("status-text").innerHTML = "Lobby leader left the lobby,<br>you are now the leader.";
+        clearInterval(interval);
+        newLobbyLeader();
+    }
+    else if(status == "dead") {
+        saveGameToDB();
+        clearInterval(interval);
+    }
 }
 
 function joinLobby(id) {
@@ -157,12 +191,12 @@ function joinLobby(id) {
         else if(this.responseText == "empty") {
             return "empty";
         }
+        gameId = id;
 
-        console.log(this.responseText);
         unpackFromJSON(this.responseText);
         swapWindow("search-game-div", "pvp-setup-div");
         updateLobbyValues();
-        lockLobby();
+        lockLobby(true);
         saveGameToDB();
 
         waitForStart();
@@ -172,42 +206,22 @@ function joinLobby(id) {
 
 function waitForStart() {
     var interval = setInterval(() => {
-        let http = prepareLoad(gameId);
-        http.onreadystatechange = function() {
-            let valid = checkValidity(this);
-            if(valid == "wait") return;
-            else if(valid == "error") {
-                console.log("Error!");
-                return;
-            }
-            else if(this.responseText == "empty") {
-                return "empty";
-            }
-    
-            unpackFromJSON(this.responseText);
-
-            if(status == "underway") {
-                isMastermind = !creatorMastermind;
-                createGame();
-                clearInterval(interval);
-            }
-            else if(status == "lobby") {
-                document.getElementById("status-text").innerHTML = "Lobby leader left the lobby,<br>you are now the leader.";
-                clearInterval(interval);
-            }
-            else if(status == "dead") {
-                clearInterval(interval);
-            }
-        };
-        http.send();
+        loadAndWait(checkStarted, interval);
     }, 1000);
 }
 
-function lockLobby() {
-    document.getElementById("check-mastermind").disabled = true;
-    document.getElementById("game-name").readOnly = true;
-    document.getElementById("check-repeat").disabled = true;
-    document.getElementById("check-empty").disabled = true;
+function newLobbyLeader() {
+    lockLobby(false);
+    document.getElementById("check-mastermind").checked = !creatorMastermind;
+    setMastermind("check-mastermind");
+    waitForJoin();
+}
+
+function lockLobby(locked) {
+    document.getElementById("check-mastermind").disabled = locked;
+    document.getElementById("game-name").readOnly = locked;
+    document.getElementById("check-repeat").disabled = locked;
+    document.getElementById("check-empty").disabled = locked;
 }
 
 function updateLobbyValues() {
