@@ -10,7 +10,7 @@ var emptyPins;
 var creatorMastermind;
 var masterCode;
 
-const debug = true;
+const debug = false;
 
 function hideWindow(id) {
     document.getElementById(id).style.display = "none";
