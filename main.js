@@ -30,17 +30,16 @@ function unpackFromJSON(json) {
 
     gameId = arr[0][0];
     name = arr[0][1];
-    turn = arr[0][2] == MASTERMIND_TURN;
-    status = arr[0][3];
-    round = arr[0][4];
-    repeatPins = arr[0][5] == 1;
-    emptyPins = arr[0][6] == 1;
-    creatorMastermind = arr[0][7] == 1;
-    masterCode = arr[0][8];
+    status = arr[0][2];
+    round = arr[0][3];
+    repeatPins = arr[0][4] == 1;
+    emptyPins = arr[0][5] == 1;
+    creatorMastermind = arr[0][6] == 1;
+    masterCode = arr[0][7];
 }
 
 function packToJSON() {
-    let gameInfo = { "id":gameId, "name":name, "turn":turn ? 1 : 0, "status":status, "round": round, "repeat":repeatPins ? 1 : 0, "empty":emptyPins ? 1 : 0, 
+    let gameInfo = { "id":gameId, "name":name, "status":status, "round": round, "repeat":repeatPins ? 1 : 0, "empty":emptyPins ? 1 : 0, 
     "creator":creatorMastermind, "code":masterCode };
     
     return JSON.stringify(gameInfo);

@@ -31,6 +31,8 @@
             <button class="btn btn-primary" 
             onclick="swapWindow('create-game-div', 'pvp-setup-div'); createPVPGame();">Player vs. Player</button>
             <button class="btn btn-primary" onclick="swapWindow('create-game-div', 'pvai-setup-div')">Player vs. AI</button>
+            <div class="padding"></div>
+            <button class="btn btn-primary" onclick="swapWindow('create-game-div', 'startup-div')">Back</button>
         </div>
 
         <div id="search-game-div">
@@ -40,6 +42,7 @@
             <div>
                 <li id="game-list"></li>
             </div>
+            <button class="btn btn-primary" onclick="swapWindow('search-game-div', 'startup-div')">Back</button>
         </div>
 
         <div id="pvai-setup-div">

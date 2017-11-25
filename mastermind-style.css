@@ -13,6 +13,10 @@
     width: 100%;
 }
 
+.padding {
+    margin-bottom: 20px;
+}
+
 #game-div {
     display: none;
     position: relative;
@@ -160,7 +164,7 @@
 
 #search-game-div {
     display: none;
-    width: 80%;
+    width: 100%;
     margin: auto;
     text-align: center;
 }
@@ -177,7 +181,7 @@
     text-align: center;
     display: block;
     margin-bottom: 10px;
-    column-count: 7;
+    column-count: 8;
     column-rule-style: solid;
     column-rule-color: black;
     column-rule-width: 2px;

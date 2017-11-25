@@ -53,7 +53,7 @@ function createLists(results) {
     headerDiv.style.borderBottom = "solid";
     headerDiv.className = "search-result-div";
 
-    let labels = ["ID", "Name", "Round", "Status", "Repeat Pins", "Empty Pins"];
+    let labels = ["ID", "Name", "Status", "Round", "Repeat Pins", "Empty Pins", "You Are Mastermind"];
 
     for(s = 0; s < labels.length; s++) {
         let p = document.createElement("p");
@@ -68,12 +68,12 @@ function createLists(results) {
             let listDiv = document.createElement("div");
             listDiv.className = "search-result-div";
             
-            for(j = 0; j < 6; j++) {
+            for(j = 0; j < 7; j++) {
                 let p = document.createElement("p");
-                if(results[i][j] == 0) {
+                if(j != 3 && results[i][j] == 0) {
                     results[i][j] = "No";
                 }
-                else if(results[i][j] == 1) {
+                else if(j != 3 && results[i][j] == 1) {
                     results[i][j] = "Yes";
                 }
                 p.textContent = ""+results[i][j];

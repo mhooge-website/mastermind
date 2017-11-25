@@ -237,7 +237,6 @@ function setReadyAction(action) {
 
 function guessPlaced() {
     if(isOnline) saveGuessToDB();
-    turn = !turn;
     saveGameToDB();
     if(isOnline) checkGuesserUpdate();
 }
@@ -245,7 +244,6 @@ function guessPlaced() {
 function resultPlaced() {
     if(isOnline) saveResultToDB();
     round++;
-    turn = !turn;
     saveGameToDB();
     if(checkGameOver()) return;
     if(isOnline) checkMastermindUpdate();
@@ -257,7 +255,6 @@ function masterCodeSet() {
         code += ""+getColorAsIndex(codeButtons[i].color);
     }
     masterCode = code;
-    turn = !turn;
     if(isOnline) saveGameToDB();
     setReadyAction(resultPlaced);
     if(isOnline) checkMastermindUpdate();
