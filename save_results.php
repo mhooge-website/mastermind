@@ -10,7 +10,7 @@ if (!($stmt = $conn->prepare("INSERT INTO mastermind_results(game_id, result) VA
     echo "Prepare failed: (" . $conn->errno . ") " . $conn->error;
 }
 
-if (!$stmt->bind_param("si", $jsonResults->id, $jsonResults->result)) {
+if (!$stmt->bind_param("ss", $jsonResults->id, $jsonResults->result)) {
     http_response_code(500);
     echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 }

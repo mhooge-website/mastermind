@@ -67,7 +67,8 @@ function createPVPGame() {
     setInitialPVPValues();
 
     if(debug) {
-        isMastermind = true;
+        isMastermind = false;
+        isOnline = false;
         createGame();
         return;
     }
@@ -165,8 +166,8 @@ function checkDead(interval) {
 function checkStarted(interval) {
     if(status == "underway") {
         isMastermind = !creatorMastermind;
-        createGame();
         clearInterval(interval);
+        createGame();
     }
     else if(status == "lobby") {
         document.getElementById("status-text").innerHTML = "Lobby leader left the lobby,<br>you are now the leader.";
@@ -174,12 +175,13 @@ function checkStarted(interval) {
         newLobbyLeader();
     }
     else if(status == "dead") {
-        saveGameToDB();
         clearInterval(interval);
+        saveGameToDB();
     }
 }
 
 function joinLobby(id) {
+    setInitialPVPValues();
     let http = prepareLoad(id);
     http.onreadystatechange = function() {
         let valid = checkValidity(this);

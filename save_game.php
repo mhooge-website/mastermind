@@ -20,7 +20,7 @@ function insertValues() {
     $time = time();
     $id = hash("md5", $time . $jsonGame->name);
 
-    if (!$stmt->bind_param("ssisiiiii", $id, $jsonGame->name, $jsonGame->turn, $jsonGame->status, $jsonGame->round, $jsonGame->repeat, 
+    if (!$stmt->bind_param("ssisiiiis", $id, $jsonGame->name, $jsonGame->turn, $jsonGame->status, $jsonGame->round, $jsonGame->repeat, 
     $jsonGame->empty, $jsonGame->creator, $jsonGame->code)) {
         http_response_code(500);
         echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
@@ -42,7 +42,7 @@ function updateValues() {
         echo "Prepare failed: (" . $conn->errno . ") " . $conn->error;
     }
 
-    if (!$stmt->bind_param("sisiiiiis", $jsonGame->name, $jsonGame->turn, $jsonGame->status, $jsonGame->round, $jsonGame->repeat, 
+    if (!$stmt->bind_param("sisiiiiss", $jsonGame->name, $jsonGame->turn, $jsonGame->status, $jsonGame->round, $jsonGame->repeat, 
     $jsonGame->empty, $jsonGame->creator, $jsonGame->code, $jsonGame->id)) {
         http_response_code(500);
         echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
