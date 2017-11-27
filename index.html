@@ -17,7 +17,7 @@
     <script src="/projects/mastermind/search_game.js"></script>
     <script src="/projects/mastermind/game.js"></script>
 
-    <div id="content-div" class="container">
+    <div id="content-div">
         <div id="startup-div">
             <label id="startup-header-label" for="new-game-button">Start New Game</label>
             <button id="new-game-button" class="btn btn-primary" onclick="swapWindow('startup-div', 'create-game-div')">New Game</button>
@@ -29,8 +29,8 @@
         <div id="create-game-div">
             <header><h2>Create Game</h2></header>
             <button class="btn btn-primary" 
-            onclick="swapWindow('create-game-div', 'pvp-setup-div'); createPVPGame();">Player vs. Player</button>
-            <button class="btn btn-primary" onclick="swapWindow('create-game-div', 'pvai-setup-div')">Player vs. AI</button>
+            onclick="swapWindow('create-game-div', 'game-setup-div'); createPVPGame();">Player vs. Player</button>
+            <button class="btn btn-primary" onclick="swapWindow('create-game-div', 'game-setup-div'); createAIGame();">Player vs. AI</button>
             <div class="padding"></div>
             <button class="btn btn-primary" onclick="swapWindow('create-game-div', 'startup-div')">Back</button>
         </div>
@@ -45,16 +45,14 @@
             <button class="btn btn-primary" onclick="swapWindow('search-game-div', 'startup-div')">Back</button>
         </div>
 
-        <div id="pvai-setup-div">
-            <header><h2>Player vs. AI</h2></header>
-        </div>
-
-        <div id="pvp-setup-div">
-            <header><h2>Player vs. Player</h2></header>
+        <div id="game-setup-div">
+            <header><h2 id="game-mode">Player vs. Player</h2></header>
             <div>
-                <input id="game-name" readonly value="My Game" type="text" maxlength="42"></input>
-                <button id="edit-game-name" class="btn btn-primary" onclick="editGameName();">Edit</button>
-                <p id="game-id">Game ID: Something Hashed</p>
+                <div class="pvp-settings-content">
+                    <input id="game-name" readonly value="My Game" type="text" maxlength="42"></input>
+                    <button id="edit-game-name" class="btn btn-primary" onclick="editGameName();">Edit</button>
+                    <p id="game-id">Game ID: Something Hashed</p>
+                </div>
                 
                 <label>You are the Mastermind <input id="check-mastermind" name="check-mastermind" type="checkbox" 
                     onclick="setMastermind('check-mastermind');"></input></label>
@@ -62,9 +60,9 @@
                     onclick="setRepeatPins('check-repeat');"></input></label>
                 <label for="check-empty">Allow empty pins <input id="check-empty" name="check-empty" type="checkbox" 
                     onclick="setEmptyPins('check-empty');"></input></label>
-                <p id="status-text">Waiting for opponent.</p>
+                <p id="status-text" class="pvp-settings-content">Waiting for opponent.</p>
             </div>
-            <button id="exit-lobby-button" class="btn btn-primary" onclick="exitLobby(); swapWindow('pvp-setup-div', 'startup-div')">Exit</button>
+            <button id="exit-lobby-button" class="btn btn-primary" onclick="exitLobby(); swapWindow('game-setup-div', 'startup-div')">Exit</button>
         </div>
 
         <div id="game-div">

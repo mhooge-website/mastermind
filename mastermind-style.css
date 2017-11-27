@@ -204,13 +204,7 @@
     float: right;
 }
 
-#pvai-setup-div {
-    margin: auto;
-    text-align: center;
-    display: none;
-}
-
-#pvp-setup-div {
+#game-setup-div {
     width: 230px;
     margin: auto;
     text-align: center;

@@ -17,10 +17,32 @@ function createGame() {
     bwButtons = new Array(2);
     if(isMastermind) createMastermindWindow();
     else createGuesserWindow();
+    swapWindow("game-setup-div", "game-div");
     createColorDiv();
     createBWColorDiv();
     setButtonSizes();
+    document.getElementById("game-setup-div").removeChild(document.getElementById("play-button"));
     document.getElementById("exit-button").onclick = exitGame;
+
+    if(!isOnline && !isMastermind) {
+        let code = getRandomPins();
+        for(i = 0; i < code.length; i++) {
+            codeButtons[i] = { 
+                color: code[i],
+                setColor: function(clr) {
+                    this.color = clr;
+                },
+                equalColor: function(otherColor) {
+                    return this.color == otherColor;
+                },
+                isEmpty: function() {
+                    return this.color == buttonBG;
+                }
+            };
+        }
+        for(i = 0; i < codeButtons.length; i++);
+        enableCurrentRow();
+    }
 }
 
 function doAutomaticGame() {
@@ -47,13 +69,54 @@ function doAutomaticGame() {
     }, 2000);
 }
 
+function getRandomPins() {
+    let colors = pinColors;
+    if(emptyPins) colors.push(buttonBG);
+    let usedColors = new Array(4);
+    let pins = new Array(4);
+
+    for(i = 0; i < pins.length; i++) {
+        let clr = colors[Math.floor(Math.random() * colors.length)];
+        if(!repeatPins) {
+            repeated = false;
+            for(j = 0; j < usedColors.length; j++) {
+                if(clr == usedColors[j]) repeated = true;
+            }
+            while(repeated) {
+                clr = colors[Math.floor(Math.random() * colors.length)];
+                repeated = false;
+                for(j = 0; j < usedColors.length; j++) {
+                    if(clr == usedColors[j]) repeated = true;
+                }
+            }
+            usedColors[i] = clr;
+        }
+        pins[i] = clr;
+    }
+    return pins;
+}
+
+function heuristic(column) {
+    
+}
+
+function executeAIMove() {
+    let pins = null;
+    if(round > 0) {
+
+    }
+    else pins = getRandomPins();
+
+    for(i = 0; i < guessButtons[round].length; i++) guessButtons[round][i].setColor(pins[i]);
+    enableCurrentRow();
+}
+
 function createMastermindWindow() {
     createMastermindDiv();
     createCodeArea();
     setReadyAction(masterCodeSet);
 
     document.getElementById("game-div-mastermind").style.display = "block";
-    swapWindow("pvp-setup-div", "game-div");
 }
 
 function createGuesserWindow() {
@@ -61,15 +124,16 @@ function createGuesserWindow() {
     setReadyAction(guessPlaced);
 
     document.getElementById("game-div-guesser").style.display = "block";
-    swapWindow("pvp-setup-div", "game-div");
 
-    checkGuesserUpdate();
+    if(isOnline) checkGuesserUpdate();
 }
 
 function createCodeArea() {
     let row = document.getElementById("m-code-div");
     let button = document.getElementById("code-button");
-
+    let masterDiv = document.getElementById("game-div-mastermind");
+    let rowClone = row.cloneNode();
+    
     for(let i = 0; i < 4; i++) {
         let buttonClone = button.cloneNode();
         let buttonObj = createButtonObj(buttonClone, buttonBG);
@@ -77,87 +141,101 @@ function createCodeArea() {
             showColorSelection(codeButtonSelected, buttonObj);
         }
         codeButtons[i] = buttonObj;
-        row.appendChild(buttonClone);
+        rowClone.appendChild(buttonClone);
     }
+    masterDiv.appendChild(rowClone);
+    
     row.removeChild(button);
+    masterDiv.removeChild(row);
 }
 
 function createGuesserDiv() {
     let guessesDiv = document.getElementById("g-guesses-div");
     let resultsDiv = document.getElementById("g-results-div"); 
-    let guessRow = document.getElementById("g-guesses-row");
-    let resultRow = document.getElementById("g-results-row");
-    let guessButton = document.getElementById("g-guesses-button");
-    let resultButton = document.getElementById("g-results-button");
+
+    deleteOldRows();
 
     for(let i = 0; i < 10; i++) {
-        let gRowClone = guessRow.cloneNode();
-        let rRowClone = resultRow.cloneNode();
+        let gRow = document.createElement("div");
+        let rRow = document.createElement("div");
         guessButtons[i] = new Array(4);
         resultButtons[i] = new Array(4);
         for(let j = 0; j < 4; j++) {
-            let gButtonClone = guessButton.cloneNode();
-            let rButtonClone = resultButton.cloneNode();
-            let buttonObj = createButtonObj(gButtonClone, buttonBG);
+            let gButton = document.createElement("button");
+            let rButton = document.createElement("button");
+            let buttonObj = createButtonObj(gButton, buttonBG);
             buttonObj.button.onclick = () => {
                 showColorSelection(guessButtonSelected, buttonObj);
             }
             if(!debug) buttonObj.setDisabled(true);
-            let altObject = createButtonObj(rButtonClone, buttonBG);
+            let altObject = createButtonObj(rButton, buttonBG);
             if(!debug) altObject.setDisabled(true);
             
-            gRowClone.appendChild(gButtonClone);
-            rRowClone.appendChild(rButtonClone);
+            gRow.appendChild(gButton);
+            rRow.appendChild(rButton);
             guessButtons[i][j] = buttonObj;
             resultButtons[i][j] = altObject;
         }
-        guessesDiv.appendChild(gRowClone);
-        resultsDiv.appendChild(rRowClone);
+        guessesDiv.appendChild(gRow);
+        resultsDiv.appendChild(rRow);
     }
-    guessRow.removeChild(guessButton);
-    resultRow.removeChild(resultButton);
-    guessesDiv.removeChild(guessRow);
-    resultsDiv.removeChild(resultRow);
 }
 
 function createMastermindDiv() {
-    let gameDiv = document.getElementById("game-div");
     let guessesDiv = document.getElementById("m-guesses-div");
     let resultsDiv = document.getElementById("m-results-div"); 
-    let guessRow = document.getElementById("m-guesses-row");
-    let resultRow = document.getElementById("m-results-row");
-    let guessButton = document.getElementById("m-guesses-button");
-    let resultButton = document.getElementById("m-results-button");
+
+    deleteOldRows();
 
     for(let i = 0; i < 10; i++) {
-        let gRowClone = guessRow.cloneNode();
-        let rRowClone = resultRow.cloneNode();
+        let gRow = document.createElement("div");
+        let rRow = document.createElement("div");
         guessButtons[i] = new Array(4);
         resultButtons[i] = new Array(4);
         for(let j = 0; j < 4; j++) {
-            let gButtonClone = guessButton.cloneNode();
-            let rButtonClone = resultButton.cloneNode();
+            let gButton = document.createElement("button");
+            let rButton = document.createElement("button");
             
-            let buttonObj = createButtonObj(rButtonClone, buttonBG);
+            let buttonObj = createButtonObj(rButton, buttonBG);
             buttonObj.button.onclick = () => {
                 showBWColorSelection(resultButtonSelected, buttonObj);
             }
             if(!debug) buttonObj.setDisabled(true);
-            let altObject = createButtonObj(gButtonClone, buttonBG);
+            let altObject = createButtonObj(gButton, buttonBG);
             if(!debug) altObject.setDisabled(true);
 
-            gRowClone.appendChild(gButtonClone);
-            rRowClone.appendChild(rButtonClone);
+            gRow.appendChild(gButton);
+            rRow.appendChild(rButton);
             guessButtons[i][j] = altObject;
             resultButtons[i][j] = buttonObj;
         }
-        guessesDiv.appendChild(gRowClone);
-        resultsDiv.appendChild(rRowClone);
+        guessesDiv.appendChild(gRow);
+        resultsDiv.appendChild(rRow);
     }
-    guessRow.removeChild(guessButton);
-    resultRow.removeChild(resultButton);
-    guessesDiv.removeChild(guessRow);
-    resultsDiv.removeChild(resultRow);
+}
+
+function deleteOldRows() {
+    let resultRow = "-results-div";
+    let guessRow = "-guesses-div";
+
+    if(isMastermind) {
+        resultRow = "m" + resultRow;
+        guessRow = "m" + guessRow;
+    }
+    else {
+        resultRow = "g" + resultRow;
+        guessRow = "g" + guessRow;
+    }
+    let rDiv = document.getElementById(resultRow);
+    let gDiv = document.getElementById(guessRow);
+
+    let resultsChildren = rDiv.children;
+    let guessChildren = gDiv.children;
+
+    for(i = 0; i < resultsChildren.length; i++) {
+        rDiv.removeChild(resultsChildren.item(i));
+        gDiv.removeChild(guessChildren.item(i));
+    }
 }
 
 function createButtonObj(btn, clr) {
@@ -236,17 +314,28 @@ function setReadyAction(action) {
 }
 
 function guessPlaced() {
-    if(isOnline) saveGuessToDB();
-    saveGameToDB();
-    if(isOnline) checkGuesserUpdate();
+    if(isOnline) {
+        saveGuessToDB();
+        saveGameToDB();
+        checkGuesserUpdate();
+    }
+    else {
+        let result = getResultForCurrentGuess(codeButtons, guessButtons[9-round]);
+        for(i = 0; i < resultButtons[9-round].length; i++) {
+            resultButtons[9-round][i].setColor(result[i]);
+        }
+        resultPlaced();
+    }
 }
 
 function resultPlaced() {
     if(isOnline) saveResultToDB();
     round++;
-    saveGameToDB();
+    if(isOnline) saveGameToDB();
     if(checkGameOver()) return;
     if(isOnline) checkMastermindUpdate();
+    else if(!isMastermind) enableCurrentRow();
+    else executeAIMove();
 }
 
 function masterCodeSet() {
@@ -258,6 +347,7 @@ function masterCodeSet() {
     if(isOnline) saveGameToDB();
     setReadyAction(resultPlaced);
     if(isOnline) checkMastermindUpdate();
+    else executeAIMove();
 }
 
 function checkGameOver() {
@@ -272,7 +362,9 @@ function checkGameOver() {
     else {
         let gameOver = true;
         let guess = guessButtons[round-1];
+        if(!isMastermind) guess = guessButtons[10-round];
         for(i = 0; i < codeButtons.length; i++) {
+            console.log("Checking: " + guess[i].color + " vs " + codeButtons[i].color);
             if(!guess[i].equalColor(codeButtons[i].color)) {
                 gameOver = false;
                 break;
@@ -321,6 +413,7 @@ function getResultForCurrentGuess(code, guess) {
             }
         }
     }
+    shuffle(outcome);
     return outcome;
 }
 
@@ -339,6 +432,16 @@ function isResultValid(code, guess, results) {
         if(outcome[i] != null) return false;
     }
     return true;
+}
+
+function shuffle(arr) {
+    var j, x, i;
+    for (i = arr.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = arr[i];
+        arr[i] = arr[j];
+        arr[j] = x;
+    }
 }
 
 function codeButtonSelected(button, color) {
@@ -463,7 +566,7 @@ function hideBWColorSelection() {
 }
 
 function exitGame() {
-    
+    swapWindow("game-div", "startup-div");
 }
 
 function checkGuesserUpdate() {

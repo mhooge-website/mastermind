@@ -21,7 +21,7 @@ function exitLobby() {
     if(status == "lobby") status = "dead";
     else status = "lobby";
     let readyButton = document.getElementById("play-button");
-    if(readyButton != null) document.getElementById("pvp-setup-div").removeChild(readyButton);
+    if(readyButton != null) document.getElementById("game-setup-div").removeChild(readyButton);
     
     saveGameToDB();
 }
@@ -42,6 +42,11 @@ function editGameName() {
     }
 }
 
+function setInitialAIValues() {
+    isOnline = false;
+    setInitialSharedValues();
+}
+
 function setInitialPVPValues() {
     setInitialSharedValues();
     status = "lobby";
@@ -52,7 +57,6 @@ function setInitialPVPValues() {
 
 function setInitialSharedValues() {
     creatorMastermind = true;
-    turn = MASTERMIND_TURN;
     round = 0;
     masterCode = null;
     repeatPins = false;
@@ -63,12 +67,24 @@ function setInitialSharedValues() {
     document.getElementById("check-empty").checked = emptyPins;
 }
 
+function createAIGame() {
+    setInitialAIValues();
+    let items = document.getElementsByClassName("pvp-settings-content");
+    for(i = 0; i < items.length; i++) {
+        items.item(i).style.display = "none";
+    }
+    document.getElementById("game-mode").textContent = "Player vs. AI";
+
+    addStartGameButton();
+}
+
 function createPVPGame() {
     setInitialPVPValues();
+    document.getElementById("game-mode").textContent = "Player vs. Player";
 
     if(debug) {
-        isMastermind = false;
-        isOnline = false;
+        isMastermind = true;
+        isOnline = false
         createGame();
         return;
     }
@@ -100,13 +116,15 @@ function addStartGameButton() {
     startButton.className = "btn btn-primary";
     startButton.textContent = "Play";
     startButton.onclick = function() {
-        status = "underway";
         isMastermind = creatorMastermind;
-        saveGameToDB();
+        if(isOnline) {
+            status = "underway";
+            saveGameToDB();
+        }
         createGame();
     };
 
-    let setupDiv = document.getElementById("pvp-setup-div");
+    let setupDiv = document.getElementById("game-setup-div");
     setupDiv.insertBefore(startButton, document.getElementById("exit-lobby-button"));
 }
 
