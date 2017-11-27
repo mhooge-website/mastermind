@@ -96,7 +96,7 @@ function getRandomPins() {
     return pins;
 }
 
-function heuristic(column) {
+function heuristic(pinNr) {
     
 }
 
@@ -130,30 +130,27 @@ function createGuesserWindow() {
 
 function createCodeArea() {
     let row = document.getElementById("m-code-div");
-    let button = document.getElementById("code-button");
-    let masterDiv = document.getElementById("game-div-mastermind");
-    let rowClone = row.cloneNode();
     
     for(let i = 0; i < 4; i++) {
-        let buttonClone = button.cloneNode();
-        let buttonObj = createButtonObj(buttonClone, buttonBG);
+        let button = document.createElement("button");
+        button.id = "code-button";
+        button.className = "code-button";
+        let buttonObj = createButtonObj(button, buttonBG);
         buttonObj.button.onclick = (e) => {
             showColorSelection(codeButtonSelected, buttonObj);
         }
         codeButtons[i] = buttonObj;
-        rowClone.appendChild(buttonClone);
+        row.appendChild(button);
     }
-    masterDiv.appendChild(rowClone);
-    
-    row.removeChild(button);
-    masterDiv.removeChild(row);
 }
 
 function createGuesserDiv() {
     let guessesDiv = document.getElementById("g-guesses-div");
     let resultsDiv = document.getElementById("g-results-div"); 
+    document.getElementById("game-div-guesser").style.display = "block";
+    document.getElementById("game-div-mastermind").style.display = "none";
 
-    deleteOldRows();
+    deleteOldElements();
 
     for(let i = 0; i < 10; i++) {
         let gRow = document.createElement("div");
@@ -184,8 +181,10 @@ function createGuesserDiv() {
 function createMastermindDiv() {
     let guessesDiv = document.getElementById("m-guesses-div");
     let resultsDiv = document.getElementById("m-results-div"); 
+    document.getElementById("game-div-mastermind").style.display = "block";
+    document.getElementById("game-div-guesser").style.display = "none";
 
-    deleteOldRows();
+    deleteOldElements();
 
     for(let i = 0; i < 10; i++) {
         let gRow = document.createElement("div");
@@ -214,7 +213,7 @@ function createMastermindDiv() {
     }
 }
 
-function deleteOldRows() {
+function deleteOldElements() {
     let resultRow = "-results-div";
     let guessRow = "-guesses-div";
 
@@ -226,15 +225,32 @@ function deleteOldRows() {
         resultRow = "g" + resultRow;
         guessRow = "g" + guessRow;
     }
-    let rDiv = document.getElementById(resultRow);
-    let gDiv = document.getElementById(guessRow);
 
-    let resultsChildren = rDiv.children;
-    let guessChildren = gDiv.children;
+    var guessDivs = document.getElementsByClassName("guesses-div");
+    var resultDivs = document.getElementsByClassName("results-div");
+    var codeDiv = document.getElementById("m-code-div");
+    var colorDiv = document.getElementById("color-all-div");
+    var colorBWDiv = document.getElementById("color-bw-div");
 
-    for(i = 0; i < resultsChildren.length; i++) {
-        rDiv.removeChild(resultsChildren.item(i));
-        gDiv.removeChild(guessChildren.item(i));
+    for(i = 0; i < guessDivs.length; i++) {
+        divs = [guessDivs, resultDivs];
+        for(j = 0; j < 2; j++) {
+            let div = divs[i].item(j);
+            while(div.firstChild) {
+                div.removeChild(div.firstChild);
+            }
+        }
+    }
+
+    
+    while(codeDiv.firstChild) {
+        codeDiv.removeChild(codeDiv.firstChild);
+    }
+    while(colorDiv.firstChild) {
+        colorDiv.removeChild(colorDiv.firstChild);
+    }
+    while(colorBWDiv.firstChild) {
+        colorBWDiv.removeChild(colorBWDiv.firstChild);
     }
 }
 
@@ -364,7 +380,6 @@ function checkGameOver() {
         let guess = guessButtons[round-1];
         if(!isMastermind) guess = guessButtons[10-round];
         for(i = 0; i < codeButtons.length; i++) {
-            console.log("Checking: " + guess[i].color + " vs " + codeButtons[i].color);
             if(!guess[i].equalColor(codeButtons[i].color)) {
                 gameOver = false;
                 break;
@@ -457,11 +472,7 @@ function codeButtonSelected(button, color) {
 
 function resultButtonSelected(button, color) {
     colorButton(button, color);
-    if(isResultValid(codeButtons, guessButtons[round], resultButtons[round])) {
-        console.log("Valid");
-        document.getElementById("ready-button").disabled = false;
-    }
-    else console.log("Invalid");
+    if(isResultValid(codeButtons, guessButtons[round], resultButtons[round])) document.getElementById("ready-button").disabled = false;
 }
 
 function guessButtonSelected(button, color) {
@@ -492,6 +503,7 @@ function createColorDiv() {
 
         div.appendChild(button);
     }
+    div.style.display = "none";
 }
 
 function createBWColorDiv() {
@@ -503,6 +515,7 @@ function createBWColorDiv() {
 
         div.appendChild(button);
     }
+    div.style.display = "none";
 }
 
 function checkIsRepeated(color) {
