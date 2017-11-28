@@ -11,8 +11,8 @@ else updateValues();
 
 function insertValues() {
     global $conn, $jsonGame;
-    if (!($stmt = $conn->prepare("INSERT INTO mastermind_games(id, name, status, round, repeat_pins, empty_pins, creator_mastermind, code) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)"))) {
+    if (!($stmt = $conn->prepare("INSERT INTO mastermind_games(id, name, status, round, repeat_pins, empty_pins, autoplace_results, 
+    creator_mastermind, code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"))) {
         http_response_code(500);
         echo "Prepare failed: (" . $conn->errno . ") " . $conn->error;
     }
@@ -20,8 +20,8 @@ function insertValues() {
     $time = time();
     $id = hash("md5", $time . $jsonGame->name);
 
-    if (!$stmt->bind_param("sssiiiis", $id, $jsonGame->name, $jsonGame->status, $jsonGame->round, $jsonGame->repeat, 
-    $jsonGame->empty, $jsonGame->creator, $jsonGame->code)) {
+    if (!$stmt->bind_param("sssiiiiis", $id, $jsonGame->name, $jsonGame->status, $jsonGame->round, $jsonGame->repeat, 
+    $jsonGame->empty, $jsonGame->autoresults, $jsonGame->creator, $jsonGame->code)) {
         http_response_code(500);
         echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
     }
@@ -36,14 +36,14 @@ function insertValues() {
 
 function updateValues() {
     global $conn, $jsonGame;
-    if (!($stmt = $conn->prepare("UPDATE mastermind_games SET name=?, status=?, round=?, repeat_pins=?, empty_pins=?, 
+    if (!($stmt = $conn->prepare("UPDATE mastermind_games SET name=?, status=?, round=?, repeat_pins=?, empty_pins=?, autoplace_results=?,
     creator_mastermind=?, code=? WHERE id=?"))) {
         http_response_code(500);
         echo "Prepare failed: (" . $conn->errno . ") " . $conn->error;
     }
 
-    if (!$stmt->bind_param("ssiiiiss", $jsonGame->name, $jsonGame->status, $jsonGame->round, $jsonGame->repeat, 
-    $jsonGame->empty, $jsonGame->creator, $jsonGame->code, $jsonGame->id)) {
+    if (!$stmt->bind_param("ssiiiiiss", $jsonGame->name, $jsonGame->status, $jsonGame->round, $jsonGame->repeat, 
+    $jsonGame->empty, $jsonGame->autoresults ,$jsonGame->creator, $jsonGame->code, $jsonGame->id)) {
         http_response_code(500);
         echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
     }

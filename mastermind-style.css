@@ -36,8 +36,8 @@
     padding-top: 5px;
     padding-bottom: 1px;
     margin-bottom: 10px;
-    width: 100%;
 
+    width: fit-content;
     height: inherit;
 }
 
@@ -73,14 +73,11 @@
 }
 
 .results-div > div {
-    width: 80%;
     display: block;
-    margin-bottom: 5px;
 }
 
 .results-div > div > button {
     margin-right: 1px;
-    margin-bottom: 4px;
 }
 
 .guesses-div > div > button {

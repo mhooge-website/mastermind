@@ -60,6 +60,8 @@
                     onclick="setRepeatPins('check-repeat');"></input></label>
                 <label for="check-empty">Allow empty pins <input id="check-empty" name="check-empty" type="checkbox" 
                     onclick="setEmptyPins('check-empty');"></input></label>
+                <label for="check-autoresults">Automatically place results <input id="check-autoresults" name="check-autoresults" type="checkbox" 
+                    onclick="setAutoResults('check-autoresults');"></input></label>
                 <p id="status-text" class="pvp-settings-content">Waiting for opponent.</p>
             </div>
             <button id="exit-lobby-button" class="btn btn-primary" onclick="exitLobby(); swapWindow('game-setup-div', 'startup-div')">Exit</button>
@@ -82,9 +84,7 @@
     
             <div id="game-div-guesser">
                 <div id="g-code-div" class="code-div">
-                    <div id="code-hide-div">
-                        <img src="/projects/mastermind/cover_full.png" alt="Code" width="100%"/>
-                    </div>
+                    <img src="/projects/mastermind/cover_full.png" alt="Code" width="100%"/>
                 </div>
                 <div class="rows-div">
                     <div id="g-guesses-div" class="guesses-div">

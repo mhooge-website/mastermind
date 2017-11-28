@@ -1,16 +1,21 @@
 function setMastermind(id) {
     creatorMastermind = document.getElementById(id).checked;
-    saveGameToDB();
+    if(isOnline) saveGameToDB();
 }
 
 function setRepeatPins(id) {
     repeatPins = document.getElementById(id).checked;
-    saveGameToDB();
+    if(isOnline) saveGameToDB();
 }
 
 function setEmptyPins(id) {
     emptyPins = document.getElementById(id).checked;
-    saveGameToDB();
+    if(isOnline) saveGameToDB();
+}
+
+function setAutoResults(id) {
+    autoResults = document.getElementById(id).checked;
+    if(isOnline) saveGameToDB();
 }
 
 function setShownID() {
@@ -18,12 +23,14 @@ function setShownID() {
 }
 
 function exitLobby() {
-    if(status == "lobby") status = "dead";
-    else status = "lobby";
-    let readyButton = document.getElementById("play-button");
-    if(readyButton != null) document.getElementById("game-setup-div").removeChild(readyButton);
-    
-    saveGameToDB();
+    if(isOnline) {
+        if(status == "lobby") status = "dead";
+        else status = "lobby";
+        let readyButton = document.getElementById("play-button");
+        if(readyButton != null) document.getElementById("game-setup-div").removeChild(readyButton);
+        
+        saveGameToDB();
+    }
 }
 
 function editGameName() {
@@ -61,6 +68,7 @@ function setInitialSharedValues() {
     masterCode = null;
     repeatPins = false;
     emptyPins = false;
+    autoResults = false;
 
     document.getElementById("check-mastermind").checked = creatorMastermind;
     document.getElementById("check-repeat").checked = repeatPins;
@@ -214,7 +222,7 @@ function joinLobby(id) {
         gameId = id;
 
         unpackFromJSON(this.responseText);
-        swapWindow("search-game-div", "pvp-setup-div");
+        swapWindow("search-game-div", "game-setup-div");
         updateLobbyValues();
         lockLobby(true);
         saveGameToDB();
@@ -242,6 +250,7 @@ function lockLobby(locked) {
     document.getElementById("game-name").readOnly = locked;
     document.getElementById("check-repeat").disabled = locked;
     document.getElementById("check-empty").disabled = locked;
+    document.getElementById("check-autoresults").disabled = locked;
 }
 
 function updateLobbyValues() {
@@ -250,6 +259,7 @@ function updateLobbyValues() {
     document.getElementById("game-id").textContent = gameId;
     document.getElementById("check-repeat").checked = repeatPins;
     document.getElementById("check-empty").checked = emptyPins;
+    document.getElementById("check-autoresults").checked = autoResults;
     round = 0;
 
     document.getElementById("status-text").innerHTML = "Waiting for lobby leader<br>to start the game...";

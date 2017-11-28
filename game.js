@@ -108,7 +108,8 @@ function executeAIMove() {
     else pins = getRandomPins();
 
     for(i = 0; i < guessButtons[round].length; i++) guessButtons[round][i].setColor(pins[i]);
-    enableCurrentRow();
+    if(!autoResults) enableCurrentRow();
+    else placeAutomaticResult();
 }
 
 function createMastermindWindow() {
@@ -154,27 +155,41 @@ function createGuesserDiv() {
 
     for(let i = 0; i < 10; i++) {
         let gRow = document.createElement("div");
-        let rRow = document.createElement("div");
+        let rRow1 = document.createElement("div");
+        let rRow2 = document.createElement("div");
         guessButtons[i] = new Array(4);
         resultButtons[i] = new Array(4);
         for(let j = 0; j < 4; j++) {
             let gButton = document.createElement("button");
-            let rButton = document.createElement("button");
             let buttonObj = createButtonObj(gButton, buttonBG);
             buttonObj.button.onclick = () => {
                 showColorSelection(guessButtonSelected, buttonObj);
             }
             if(!debug) buttonObj.setDisabled(true);
-            let altObject = createButtonObj(rButton, buttonBG);
-            if(!debug) altObject.setDisabled(true);
             
             gRow.appendChild(gButton);
-            rRow.appendChild(rButton);
             guessButtons[i][j] = buttonObj;
+        }
+        for(j = 0; j < 4; j++) {
+            let rButton = document.createElement("button");
+
+            let altObject = createButtonObj(rButton, buttonBG);
+            if(!debug) altObject.setDisabled(true);
+
+            if(j < 2) {
+                rRow1.appendChild(rButton);
+                rRow1.style.marginBottom = "4px";
+            }
+            else {
+                rRow2.appendChild(rButton);
+                rRow2.style.marginBottom = "9px";
+            }
+            
             resultButtons[i][j] = altObject;
         }
         guessesDiv.appendChild(gRow);
-        resultsDiv.appendChild(rRow);
+        resultsDiv.appendChild(rRow1);
+        resultsDiv.appendChild(rRow2);
     }
 }
 
@@ -188,28 +203,43 @@ function createMastermindDiv() {
 
     for(let i = 0; i < 10; i++) {
         let gRow = document.createElement("div");
-        let rRow = document.createElement("div");
+        let rRow1 = document.createElement("div");
+        let rRow2 = document.createElement("div");
         guessButtons[i] = new Array(4);
         resultButtons[i] = new Array(4);
         for(let j = 0; j < 4; j++) {
             let gButton = document.createElement("button");
-            let rButton = document.createElement("button");
             
+            let altObject = createButtonObj(gButton, buttonBG);
+            if(!debug) altObject.setDisabled(true);
+
+            gRow.appendChild(gButton);
+            
+            guessButtons[i][j] = altObject;
+        }
+        for(j = 0; j < 4; j++) {
+            let rButton = document.createElement("button");
+
             let buttonObj = createButtonObj(rButton, buttonBG);
             buttonObj.button.onclick = () => {
                 showBWColorSelection(resultButtonSelected, buttonObj);
             }
             if(!debug) buttonObj.setDisabled(true);
-            let altObject = createButtonObj(gButton, buttonBG);
-            if(!debug) altObject.setDisabled(true);
 
-            gRow.appendChild(gButton);
-            rRow.appendChild(rButton);
-            guessButtons[i][j] = altObject;
+            if(j < 2) {
+                rRow1.appendChild(rButton);
+                rRow1.style.marginBottom = "4px";
+            }
+            else {
+                rRow2.appendChild(rButton);
+                rRow2.style.marginBottom = "9px";
+            }
+            
             resultButtons[i][j] = buttonObj;
         }
         guessesDiv.appendChild(gRow);
-        resultsDiv.appendChild(rRow);
+        resultsDiv.appendChild(rRow1);
+        resultsDiv.appendChild(rRow2);
     }
 }
 
@@ -241,7 +271,6 @@ function deleteOldElements() {
             }
         }
     }
-
     
     while(codeDiv.firstChild) {
         codeDiv.removeChild(codeDiv.firstChild);
@@ -329,6 +358,21 @@ function setReadyAction(action) {
     }
 }
 
+function placeAutomaticResult() {
+    let guesses = guessButtons[round];
+    let results = resultButtons[round];
+    if(!isMastermind) {
+        guesses = guessButtons[9-round];
+        results = resultButtons[9-round];
+    }
+
+    let result = getResultForCurrentGuess(codeButtons, guesses);
+    for(i = 0; i < results.length; i++) {
+        colorButton(results[i], result[i]);
+    }
+    resultPlaced();
+}
+
 function guessPlaced() {
     if(isOnline) {
         saveGuessToDB();
@@ -336,11 +380,7 @@ function guessPlaced() {
         checkGuesserUpdate();
     }
     else {
-        let result = getResultForCurrentGuess(codeButtons, guessButtons[9-round]);
-        for(i = 0; i < resultButtons[9-round].length; i++) {
-            resultButtons[9-round][i].setColor(result[i]);
-        }
-        resultPlaced();
+        placeAutomaticResult();
     }
 }
 
@@ -624,7 +664,10 @@ function guessesLoaded(guesses, interval) {
             if(char != '6') color = pinColors[parseInt(char)];
             colorButton(guessButtons[round][i], color);
         }
-        enableCurrentRow();
+        if(!autoResults) enableCurrentRow();
+        else {
+            placeAutomaticResult();
+        }
     }
 }
 

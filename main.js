@@ -9,6 +9,7 @@ var repeatPins;
 var emptyPins;
 var creatorMastermind;
 var masterCode;
+var autoResults;
 
 const debug = false;
 
@@ -34,13 +35,14 @@ function unpackFromJSON(json) {
     round = arr[0][3];
     repeatPins = arr[0][4] == 1;
     emptyPins = arr[0][5] == 1;
-    creatorMastermind = arr[0][6] == 1;
-    masterCode = arr[0][7];
+    autoResults = arr[0][6] == 1;
+    creatorMastermind = arr[0][7] == 1;
+    masterCode = arr[0][8];
 }
 
 function packToJSON() {
     let gameInfo = { "id":gameId, "name":name, "status":status, "round": round, "repeat":repeatPins ? 1 : 0, "empty":emptyPins ? 1 : 0, 
-    "creator":creatorMastermind, "code":masterCode };
+    "autoresults":autoResults ? 1 : 0, "creator":creatorMastermind, "code":masterCode };
     
     return JSON.stringify(gameInfo);
 }
