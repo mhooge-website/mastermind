@@ -40,8 +40,12 @@ function createGame() {
                 }
             };
         }
-        for(i = 0; i < codeButtons.length; i++);
         enableCurrentRow();
+    }
+    else if(!isOnline && debug) {
+        let code = getRandomPins();
+        for(i = 0; i < codeButtons.length; i++) colorButton(codeButtons[i], code[i]);
+        masterCodeSet();
     }
 }
 
@@ -97,19 +101,36 @@ function getRandomPins() {
 }
 
 function heuristic(pinNr) {
+    const wPoint = 1;
+    const bPoint = 2;
+    var pointArr = new Array(round);
+    for(i = 0; i < round; i++) {
+        pointArr[i] = 0;
+        for(j = 0; j < resultButtons[i].length; j++) {
+            if(resultButtons[i][j].color == "black") pointArr[i] += bPoint;
+            else if(resultButtons[i][j].color == "white") pointArr[i] += wPoint;
+        }
+        console.log(pointArr[i]);
+    }
+}
+
+function swapOutValues() {
     
 }
 
 function executeAIMove() {
-    let pins = null;
-    if(round > 0) {
-
-    }
-    else pins = getRandomPins();
-
-    for(i = 0; i < guessButtons[round].length; i++) guessButtons[round][i].setColor(pins[i]);
-    if(!autoResults) enableCurrentRow();
-    else placeAutomaticResult();
+    setTimeout(() => {
+        let pins = null;
+        if(round > 0) {
+            heuristic();
+            return;
+        }
+        else pins = getRandomPins();
+    
+        for(i = 0; i < guessButtons[round].length; i++) guessButtons[round][i].setColor(pins[i]);
+        if(!autoResults) enableCurrentRow();
+        else placeAutomaticResult();
+    }, 1000);
 }
 
 function createMastermindWindow() {
