@@ -100,29 +100,77 @@ function getRandomPins() {
     return pins;
 }
 
-function heuristic(pinNr) {
-    const wPoint = 1;
-    const bPoint = 2;
-    var pointArr = new Array(round);
+function heuristic() {
+    let arr = new Array(4);
     for(i = 0; i < round; i++) {
-        pointArr[i] = 0;
+        let points = 0;
         for(j = 0; j < resultButtons[i].length; j++) {
-            if(resultButtons[i][j].color == "black") pointArr[i] += bPoint;
-            else if(resultButtons[i][j].color == "white") pointArr[i] += wPoint;
+            
         }
-        console.log(pointArr[i]);
     }
+    return arr;
 }
 
-function swapOutValues() {
-    
+function getUniquePin(pins) {
+    repeated = true;
+    while(repeated) {
+        let clr = pinColors[Math.floor(Math.random() * pinColors.length)];
+        repeated = false;
+        for(j = 0; j < pins.length; j++) {
+            if(pins[j].color == clr) {
+                repeated = true;
+                break;
+            }
+        }
+    }
+    return clr;
+}
+
+function getPointsForRound(r) {
+    const wPoint = 1;
+    const bPoint = 2;
+    let points = 0;
+    for(i = 0; i < resultButtons[r].length; i++) {
+        if(resultButtons[r][i].color == "black") points += bPoint;
+        else if(resultButtons[r][i].color == "white") points += wPoint;
+    }
+    return points;
+}
+
+function swapOutValues(guesses) {
+    let lastGuess = new Array(4);
+    for(i = 0; i < guesses.length; i++) lastGuess[i] = guesses[i];
+    let lastRes = resultButtons[round-1];
+    for(i = 0; i < res.length; i++) {
+        if(res[i] == "white") lastGuess[lastGuess.length-1-i] = null;
+        else if(res[i] != "black") lastGuess[lastGuess.length-1-i] = undefined; 
+    }
+    let newGuess = new Array(4);
+    for(i = 0; i < lastGuess.length; i++) {
+        if(lastGuess[i] == null) {
+            let newPos = Math.floor(Math.random() * newGuess.length);
+            while(newPos != i) {
+                newPos = Math.floor(Math.random() * newGuess.length);
+            }
+            newGuess[newPos] = guesses[i];
+        }
+        else if(lastGuess[i] == undefined) {
+            newGuess[i] = getUniquePin(guesses);
+        }
+        else newGuess[i] = lastGuess[i];
+    }
 }
 
 function executeAIMove() {
     setTimeout(() => {
         let pins = null;
         if(round > 0) {
-            heuristic();
+            let previous = getPointsForRound(round-1);
+            let now = getPointsForRound(round);
+            if(now < previous) {
+                swapOutValues(guessButtons[round-1]);
+            }
+
             return;
         }
         else pins = getRandomPins();
