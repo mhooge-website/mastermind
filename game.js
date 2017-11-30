@@ -113,11 +113,13 @@ function heuristic() {
 
 function getUniquePin(pins) {
     repeated = true;
+    let clr = null;
     while(repeated) {
-        let clr = pinColors[Math.floor(Math.random() * pinColors.length)];
+        clr = pinColors[Math.floor(Math.random() * pinColors.length)];
+        console.log(clr);
         repeated = false;
-        for(j = 0; j < pins.length; j++) {
-            if(pins[j].color == clr) {
+        for(i = 0; i < pins.length; i++) {
+            if(pins[i].color == clr) {
                 repeated = true;
                 break;
             }
@@ -139,11 +141,12 @@ function getPointsForRound(r) {
 
 function swapOutValues(guesses) {
     let lastGuess = new Array(4);
-    for(i = 0; i < guesses.length; i++) lastGuess[i] = guesses[i];
+    for(i = 0; i < guesses.length; i++) lastGuess[i] = "b";
     let lastRes = resultButtons[round-1];
+    console.log(round);
     for(i = 0; i < lastRes.length; i++) {
         if(lastRes[i].color == "white") lastGuess[lastGuess.length-1-i] = null;
-        else if(lastRes[i].color != "black") lastGuess[lastGuess.length-1-i] = undefined; 
+        else if(lastRes[i].color != "black") lastGuess[lastGuess.length-1-i] = "none"; 
     }
     let newGuess = new Array(4);
     for(i = 0; i < lastGuess.length; i++) {
@@ -155,12 +158,12 @@ function swapOutValues(guesses) {
             }
             newGuess[newPos] = guesses[i].color;
         }
-        else if(lastGuess[i] == undefined) {
-            newGuess[i] = getUniquePin(guesses).color;
+        else if(lastGuess[i] == "none") {
+            newGuess[i] = getUniquePin(guesses);
+            console.log("none: " + newGuess[i]);
         }
         else {
             newGuess[i] = lastGuess[i].color;
-            console.log("black");
         }
     }
     return newGuess;
