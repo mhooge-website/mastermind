@@ -141,44 +141,47 @@ function swapOutValues(guesses) {
     let lastGuess = new Array(4);
     for(i = 0; i < guesses.length; i++) lastGuess[i] = guesses[i];
     let lastRes = resultButtons[round-1];
-    for(i = 0; i < res.length; i++) {
-        if(res[i] == "white") lastGuess[lastGuess.length-1-i] = null;
-        else if(res[i] != "black") lastGuess[lastGuess.length-1-i] = undefined; 
+    for(i = 0; i < lastRes.length; i++) {
+        if(lastRes[i].color == "white") lastGuess[lastGuess.length-1-i] = null;
+        else if(lastRes[i].color != "black") lastGuess[lastGuess.length-1-i] = undefined; 
     }
     let newGuess = new Array(4);
     for(i = 0; i < lastGuess.length; i++) {
         if(lastGuess[i] == null) {
+            console.log("white");
             let newPos = Math.floor(Math.random() * newGuess.length);
             while(newPos != i) {
                 newPos = Math.floor(Math.random() * newGuess.length);
             }
-            newGuess[newPos] = guesses[i];
+            newGuess[newPos] = guesses[i].color;
         }
         else if(lastGuess[i] == undefined) {
-            newGuess[i] = getUniquePin(guesses);
+            newGuess[i] = getUniquePin(guesses).color;
         }
-        else newGuess[i] = lastGuess[i];
+        else {
+            newGuess[i] = lastGuess[i].color;
+            console.log("black");
+        }
     }
+    return newGuess;
 }
 
 function executeAIMove() {
+    var pins = null;
     setTimeout(() => {
-        let pins = null;
         if(round > 0) {
             let previous = getPointsForRound(round-1);
             let now = getPointsForRound(round);
             if(now < previous) {
-                swapOutValues(guessButtons[round-1]);
+                pins = swapOutValues(guessButtons[round-1]);
             }
-
-            return;
         }
         else pins = getRandomPins();
-    
+        
         for(i = 0; i < guessButtons[round].length; i++) guessButtons[round][i].setColor(pins[i]);
         if(!autoResults) enableCurrentRow();
         else placeAutomaticResult();
-    }, 1000);
+    }, 1000);    
 }
 
 function createMastermindWindow() {
