@@ -140,32 +140,28 @@ function getPointsForRound(r) {
 }
 
 function swapOutValues(guesses) {
-    let lastGuess = new Array(4);
-    for(i = 0; i < guesses.length; i++) lastGuess[i] = "b";
-    let lastRes = resultButtons[round-1];
-    console.log(round);
-    for(i = 0; i < lastRes.length; i++) {
-        if(lastRes[i].color == "white") lastGuess[lastGuess.length-1-i] = null;
-        else if(lastRes[i].color != "black") lastGuess[lastGuess.length-1-i] = "none"; 
-    }
     let newGuess = new Array(4);
-    for(i = 0; i < lastGuess.length; i++) {
-        if(lastGuess[i] == null) {
-            console.log("white");
+    let lastRes = resultButtons[round-1];
+    for(i = 0; i < lastRes.length; i++) {
+        if(lastRes[i].color == "black") {
+            newGuess[i] = guesses[i];
+        }
+    }
+    for(i = 0; i < lastRes.length; i++) {
+        if(lastRes[i].color == "white") {
             let newPos = Math.floor(Math.random() * newGuess.length);
-            while(newPos != i) {
+            while(newPos != i && newGuess[i] != undefined) {
                 newPos = Math.floor(Math.random() * newGuess.length);
             }
             newGuess[newPos] = guesses[i].color;
         }
-        else if(lastGuess[i] == "none") {
+    }
+    for(i = 0; i < newGuess.length; i++) {
+        if(newGuess[i] == undefined) {
             newGuess[i] = getUniquePin(guesses);
-            console.log("none: " + newGuess[i]);
-        }
-        else {
-            newGuess[i] = lastGuess[i].color;
         }
     }
+    
     return newGuess;
 }
 
