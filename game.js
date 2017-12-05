@@ -21,7 +21,8 @@ function createGame() {
     createColorDiv();
     createBWColorDiv();
     setButtonSizes();
-    document.getElementById("game-setup-div").removeChild(document.getElementById("play-button"));
+    let playButton = document.getElementById("play-button");
+    if(playButton != null) document.getElementById("game-setup-div").removeChild(playButton);
     document.getElementById("exit-button").onclick = exitGame;
 
     if(!isOnline && !isMastermind) {
@@ -481,8 +482,10 @@ function checkGameOver() {
     if(!isMastermind && status == "ended") {
         if(round > 9) masterMindWon();
         else guesserWon();
+        return true;
     }
     else if(round > 9) {
+        gameOver();
         masterMindWon();
         return true;
     }
@@ -490,32 +493,43 @@ function checkGameOver() {
         let gameOver = true;
         let guess = guessButtons[round-1];
         if(!isMastermind) guess = guessButtons[10-round];
-        for(i = 0; i < codeButtons.length; i++) {
-            if(!guess[i].equalColor(codeButtons[i].color)) {
+        for(i = 0; i < masterCode.length; i++) {
+            if(!guess[i].equalColor(pinColors[masterCode.charAt(i)])) {
                 gameOver = false;
                 break;
             }
         }
-        if(gameOver) guesserWon();
+        if(gameOver) {
+            gameOver();
+            guesserWon();
+        }
         return gameOver;
     }
 }
 
 function guesserWon() {
-    gameOver();
-    if(isMastermind) alert("You lost!");
-    else alert("You won!");
+    if(isMastermind) youLost();
+    else youWon();
 }
 
 function masterMindWon() {
-    gameOver();
-    if(isMastermind) alert("You won!");
-    else alert("You lost!");
+    if(isMastermind) youWon();
+    else youLost();
 }
 
 function gameOver() {
-    status = "ended";
-    saveGameToDB();
+    if(isOnline) {
+        status = "ended";
+        saveGameToDB();
+    }
+}
+
+function youWon() {
+    alert("You Lost! :(");
+}
+
+function youLost() {
+    alert("You Won! :D");
 }
 
 function getResultForCurrentGuess(code, guess) {
@@ -728,7 +742,7 @@ function checkMastermindUpdate() {
 function guessesLoaded(guesses, interval) {
     if(guesses.length == round + 1) {
         clearInterval(interval);
-        let guessString = ""+guesses[round][0]; 
+        let guessString = guesses[round][0]; 
         for(i = 0; i < guessString.length; i++) {
             let char = guessString.charAt(i);
             let color = buttonBG;

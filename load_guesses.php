@@ -5,7 +5,7 @@ include('../../scripts/connect_db.php');
 $id = $_POST["id"];
 $conn = connect_db("mhso_grpro");
 
-if (!($stmt = $conn->prepare("SELECT guess FROM mastermind_guesses WHERE game_id=?"))) {
+if (!($stmt = $conn->prepare("SELECT guess FROM mastermind_guesses WHERE game_id=? ORDER BY id ASC"))) {
     http_response_code(500);
     echo "Prepare failed: (" . $conn->errno . ") " . $conn->error;
     die;

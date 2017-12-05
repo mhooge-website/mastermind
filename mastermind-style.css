@@ -228,3 +228,15 @@
 #new-game-button {
     margin-bottom: 20px;
 }
+
+#game-won-div, #game-lost-div {
+    display: none;
+}
+
+#game-lost-div {
+
+}
+
+#game-won-div {
+
+}
