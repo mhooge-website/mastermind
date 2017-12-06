@@ -229,14 +229,42 @@
     margin-bottom: 20px;
 }
 
-#game-won-div, #game-lost-div {
+#game-over-div {
+    position: absolute;
+    width: 400px;
+    left: 0; right: 0;
+    margin: auto;
+    text-align: center;
+
+    color: black;
+    background-color: rgb(111, 194, 219);
+    border-style: solid;
+    border-color: black;
+    border-radius: 10px;
+    padding: 5px;
     display: none;
 }
 
-#game-lost-div {
-
+#over-header {
+    font-size: 35px;
 }
 
-#game-won-div {
+#over-subheader {
+    font-size: 30px;
+}
 
+#your-iq {
+    font-size: 25px;
+    font-style: italic;
+    color: red;
+}
+
+#iq-process-div {
+    position: relative;
+    height: 20px;
+    width: 0;
+    background-color: blue;
+    margin-bottom: 20px;
+    border-style: solid;
+    border-color: black;
 }

@@ -23,11 +23,11 @@ function setShownID() {
 }
 
 function exitLobby() {
+    let readyButton = document.getElementById("play-button");
+    if(readyButton != null) document.getElementById("game-setup-div").removeChild(readyButton);
     if(isOnline) {
         if(status == "lobby") status = "dead";
         else status = "lobby";
-        let readyButton = document.getElementById("play-button");
-        if(readyButton != null) document.getElementById("game-setup-div").removeChild(readyButton);
         
         saveGameToDB();
     }
@@ -77,17 +77,22 @@ function setInitialSharedValues() {
 
 function createAIGame() {
     setInitialAIValues();
-    let items = document.getElementsByClassName("pvp-settings-content");
-    for(i = 0; i < items.length; i++) {
-        items.item(i).style.display = "none";
-    }
+    showPVPContent(false);
     document.getElementById("game-mode").textContent = "Player vs. AI";
 
     addStartGameButton();
 }
 
+function showPVPContent(show) {
+    let items = document.getElementsByClassName("pvp-settings-content");
+    for(i = 0; i < items.length; i++) {
+        items.item(i).style.display = show ? "block" : "none";
+    }
+}
+
 function createPVPGame() {
     setInitialPVPValues();
+    showPVPContent(true);
     document.getElementById("game-mode").textContent = "Player vs. Player";
 
     if(debug) {

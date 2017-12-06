@@ -27,7 +27,9 @@ function createGame() {
 
     if(!isOnline && !isMastermind) {
         let code = getRandomPins();
+        masterCode = "";
         for(i = 0; i < code.length; i++) {
+            masterCode += ""+getColorAsIndex(code[i]);
             codeButtons[i] = { 
                 color: code[i],
                 setColor: function(clr) {
@@ -480,41 +482,43 @@ function masterCodeSet() {
 
 function checkGameOver() {
     if(!isMastermind && status == "ended") {
-        if(round > 9) masterMindWon();
+        if(round == -1) masterMindWon();
         else guesserWon();
         return true;
     }
-    else if(round > 9) {
-        gameOver();
-        masterMindWon();
-        return true;
-    }
     else {
-        let gameOver = true;
+        let didGuesserWin = true;
         let guess = guessButtons[round-1];
         if(!isMastermind) guess = guessButtons[10-round];
         for(i = 0; i < masterCode.length; i++) {
             if(!guess[i].equalColor(pinColors[masterCode.charAt(i)])) {
-                gameOver = false;
+                didGuesserWin = false;
                 break;
             }
         }
-        if(gameOver) {
+        if(didGuesserWin) {
             gameOver();
             guesserWon();
+            return true;
         }
-        return gameOver;
+        else if(round > 9) {
+            round = -1;
+            gameOver();
+            masterMindWon();
+            return true;
+        }
+        return false;
     }
 }
 
 function guesserWon() {
-    if(isMastermind) youLost();
-    else youWon();
+    if(isMastermind) youLostMastermind();
+    else youWonGuesser();
 }
 
 function masterMindWon() {
-    if(isMastermind) youWon();
-    else youLost();
+    if(isMastermind) youWonMastermind();
+    else youLostGuesser();
 }
 
 function gameOver() {
@@ -524,12 +528,75 @@ function gameOver() {
     }
 }
 
-function youWon() {
-    alert("You Lost! :(");
+function youWonGuesser() {
+    let progressDiv = document.getElementById("iq-process-div");
+    let iqLabel = document.getElementById("your-iq");
+    let overDiv = document.getElementById("game-over-div");
+    overDiv.style.display = "block";
+    progressDiv.style.display = "block";
+    let totalWidth = overDiv.offsetWidth - 20;
+    var counter = 0;
+    var iq = (10-round)+1;
+
+    gameWon();
+
+    var interval = setInterval(() => {
+        counter++;
+        
+        let currentIq = (iq * (counter/100))*100;
+        let currentWidth = (totalWidth * (iq/10)) * (counter/100);
+        progressDiv.style.width = currentWidth + "px";
+        iqLabel.textContent = "Your IQ: " + (parseInt(currentIq));
+
+        if(counter == 100) clearInterval(interval);
+    }, 25);
 }
 
-function youLost() {
-    alert("You Won! :D");
+function youLostGuesser() {
+    gameLost();
+    document.getElementById("game-over-div").style.display = "block";
+
+    document.getElementById("your-iq").textContent = "Your IQ: -1!";
+}
+
+function youWonMastermind() {
+    gameWon();
+    document.getElementById("game-over-div").style.display = "block";
+    document.getElementById("iq-process-div").style.display = "none";
+
+    document.getElementById("your-iq").textContent = "Your IQ: Over 9000!";
+}
+
+function youLostMastermind() {
+    gameLost();
+    document.getElementById("game-over-div").style.display = "block";
+    let iq = (round-1)*10;
+    document.getElementById("your-iq").textContent = "Your IQ: " + iq;
+}
+
+function gameWon() {
+    setGameOverDialogValues();
+    document.getElementById("over-header").textContent = "CONGRATULATIONS!!!";
+    document.getElementById("over-subheader").textContent = "YOU ARE THE MASTERMIND!!";
+    let button = document.getElementById("game-over-button");
+    button.textContent = "SWEET :D";
+    button.className = "btn btn-success";
+}
+
+function gameLost() {
+    setGameOverDialogValues();
+    document.getElementById("iq-process-div").style.display = "none";
+    document.getElementById("over-header").textContent = "YOU LOST!!!";
+    document.getElementById("over-subheader").textContent = "BETTER LUCK NEXT TIME!! :(";
+    let button = document.getElementById("game-over-button");
+    button.textContent = "AWW D:";
+    button.className = "btn btn-danger";
+}
+
+function setGameOverDialogValues() {
+    let overDiv = document.getElementById("game-over-div");
+    overDiv.style.top = (window.innerHeight/2 - overDiv.offsetHeight) + "px";
+    document.getElementById("game-over-button").onclick = () => overDiv.style.display = "none";
 }
 
 function getResultForCurrentGuess(code, guess) {
