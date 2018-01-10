@@ -14,7 +14,7 @@ function createGame() {
     guessButtons = new Array(10);
     resultButtons = new Array(10);
     colorButtons = new Array(6);
-    bwButtons = new Array(2);
+    bwButtons = new Array(3);
     if(isMastermind) createMastermindWindow();
     else createGuesserWindow();
     swapWindow("game-setup-div", "game-div");
@@ -119,7 +119,6 @@ function getUniquePin(pins) {
     let clr = null;
     while(repeated) {
         clr = pinColors[Math.floor(Math.random() * pinColors.length)];
-        console.log(clr);
         repeated = false;
         for(i = 0; i < pins.length; i++) {
             if(pins[i].color == clr) {
@@ -147,7 +146,7 @@ function swapOutValues(guesses) {
     let lastRes = resultButtons[round-1];
     for(i = 0; i < lastRes.length; i++) {
         if(lastRes[i].color == "black") {
-            newGuess[i] = guesses[i];
+            newGuess[i] = guesses[i].color;
         }
     }
     for(i = 0; i < lastRes.length; i++) {
@@ -177,9 +176,14 @@ function executeAIMove() {
             if(now < previous) {
                 pins = swapOutValues(guessButtons[round-1]);
             }
+            else {
+                pins = swapOutValues(guessButtons[round-1]);
+            }
         }
         else pins = getRandomPins();
-        
+        console.log("*****PINS*****");
+        for(i = 0; i < pins.length; i++) console.log(pins[i]);
+
         for(i = 0; i < guessButtons[round].length; i++) guessButtons[round][i].setColor(pins[i]);
         if(!autoResults) enableCurrentRow();
         else placeAutomaticResult();
@@ -695,6 +699,13 @@ function createColorDiv() {
 
         div.appendChild(button);
     }
+    if(emptyPins) {
+        let button = document.createElement("button");
+        colorButtons[6] = createButtonObj(button, buttonBG);
+    
+        div.appendChild(button);
+    }
+
     div.style.display = "none";
 }
 
@@ -707,6 +718,11 @@ function createBWColorDiv() {
 
         div.appendChild(button);
     }
+    let button = document.createElement("button");
+    bwButtons[2] = createButtonObj(button, buttonBG);
+
+    div.appendChild(button);
+
     div.style.display = "none";
 }
 

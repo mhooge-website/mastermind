@@ -247,6 +247,7 @@
     border-radius: 10px;
     padding: 5px;
     display: none;
+    z-index: 2;
 }
 
 #over-header {
