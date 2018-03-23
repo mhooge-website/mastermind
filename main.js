@@ -11,7 +11,7 @@ var creatorMastermind;
 var masterCode;
 var autoResults;
 
-const debug = true;
+const debug = false;
 
 function hideWindow(id) {
     document.getElementById(id).style.display = "none";

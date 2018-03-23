@@ -24,7 +24,7 @@
     z-index: 2;
     margin: auto;
     width: fit-content;
-    -moz-width: fit-content;
+    width: -moz-fit-content;
     height: fit-content;
     -moz-height: fit-content;
 }
@@ -41,7 +41,7 @@
     margin-bottom: 10px;
 
     width: fit-content;
-    -moz-width: fit-content;
+    width: -moz-fit-content;
     height: inherit;
 }
 
@@ -130,7 +130,7 @@
     display: none;
     
     height: fit-content;
-    -moz-height: fit-content;
+    height: -moz-fit-content;
     z-index: 0;
 
     top: 0; bottom: 0;
