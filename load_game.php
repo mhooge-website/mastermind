@@ -42,7 +42,7 @@ function getResults($search, $where) {
         die;
     }
 
-    bindValues($stmt, $search);
+    bindValues($stmt, "s", $search);
     execute($stmt);
     
     if(!($res = $stmt->get_result())) {
@@ -58,21 +58,4 @@ function getResults($search, $where) {
         return json_encode($val);
     }
 }
-
-function bindValues($stmt, $search) {
-    if (!$stmt->bind_param("s", $search)) {
-        http_response_code(500);
-        echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-        die;
-    }
-}
-
-function execute($stmt) {
-    if (!$stmt->execute()) {
-        http_response_code(500);
-        echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-        die;
-    }
-}
-
 ?>

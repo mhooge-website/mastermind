@@ -54,9 +54,11 @@ function createLists(results) {
     headerDiv.className = "search-result-div";
 
     let labels = ["ID", "Name", "Status", "Round", "Repeat Pins", "Empty Pins", "You Are Mastermind"];
+    let classes = ["list-l", "list-l", "list-m", "list-s", "list-s", "list-s", "list-s"];
 
     for(s = 0; s < labels.length; s++) {
         let p = document.createElement("p");
+        p.className = classes[s];
         p.textContent = labels[s];
         headerDiv.appendChild(p);
     }
@@ -69,18 +71,22 @@ function createLists(results) {
             listDiv.className = "search-result-div";
             
             for(j = 0; j < 7; j++) {
-                let p = document.createElement("p");
+                let p = document.createElement("div");
                 if(j != 3 && results[i][j] == 0) {
                     results[i][j] = "No";
                 }
                 else if(j != 3 && results[i][j] == 1) {
                     results[i][j] = "Yes";
                 }
+                p.className = classes[j];
                 p.textContent = ""+results[i][j];
                 listDiv.appendChild(p);
             }
     
             let joinButton = document.createElement("button");
+            if (results[i][2] != "lobby") {
+                joinButton.disabled = true;
+            }
             joinButton.textContent = "Join";
             joinButton.className = "btn btn-primary";
             joinButton.addEventListener("click", () => { 
